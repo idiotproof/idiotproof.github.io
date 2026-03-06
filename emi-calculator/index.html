@@ -1,773 +1,628 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="EMI Calc" />
-  <meta name="theme-color" content="#0f1117" />
-  <meta name="description" content="EMI Calculator — Loan repayment planner" />
-  <title>EMI Calculator</title>
-  <link rel="manifest" href="manifest.json" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+  <meta name="apple-mobile-web-app-title" content="EMI Calc"/>
+  <meta name="theme-color" content="#eef0fb"/>
+  <title>Loan EMI Calculator</title>
+  <link rel="manifest" href="manifest.json"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #0a0c12;
-      --surface: #13161f;
-      --card: #181c28;
-      --border: rgba(255,255,255,0.07);
-      --accent: #6ee7b7;
-      --accent2: #38bdf8;
-      --accent3: #f472b6;
-      --text: #f0f4ff;
-      --muted: #6b7280;
+      --bg: #eef0fb;
+      --white: #ffffff;
+      --border: #e2e4f3;
+      --navy: #1a1d3b;
+      --purple: #7c5cbf;
+      --purple-light: #ede8f8;
+      --blue-light: #dff3fc;
+      --blue-border: rgba(77,184,232,0.25);
+      --pink: #e84db8;
+      --muted: #8b90b0;
       --radius: 20px;
+      --shadow: 0 4px 20px rgba(100,100,180,0.10);
+      --shadow-sm: 0 2px 10px rgba(100,100,180,0.08);
     }
 
     html, body {
-      height: 100%;
+      min-height: 100%;
+      font-family: 'Nunito', sans-serif;
       background: var(--bg);
-      color: var(--text);
-      font-family: 'DM Sans', sans-serif;
+      color: var(--navy);
       -webkit-font-smoothing: antialiased;
-      overflow-x: hidden;
-    }
-
-    /* Ambient background glow */
-    body::before {
-      content: '';
-      position: fixed;
-      top: -200px; left: -200px;
-      width: 600px; height: 600px;
-      background: radial-gradient(circle, rgba(110,231,183,0.08) 0%, transparent 70%);
-      pointer-events: none;
-      z-index: 0;
-    }
-    body::after {
-      content: '';
-      position: fixed;
-      bottom: -150px; right: -150px;
-      width: 500px; height: 500px;
-      background: radial-gradient(circle, rgba(56,189,248,0.07) 0%, transparent 70%);
-      pointer-events: none;
-      z-index: 0;
     }
 
     .app {
-      position: relative;
-      z-index: 1;
-      min-height: 100vh;
-      max-width: 480px;
+      width: 100%;
+      max-width: 430px;
       margin: 0 auto;
-      padding: env(safe-area-inset-top, 0) 0 env(safe-area-inset-bottom, 0);
+      padding: env(safe-area-inset-top, 0px) 0 calc(env(safe-area-inset-bottom, 0px) + 28px);
     }
 
-    /* ── Header ── */
-    header {
-      padding: 52px 24px 20px;
+    /* ── Top bar ── */
+    .topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 52px 22px 0;
     }
-    .header-label {
-      font-family: 'DM Sans', sans-serif;
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 6px;
-    }
-    header h1 {
-      font-family: 'Syne', sans-serif;
-      font-size: 30px;
-      font-weight: 800;
-      color: var(--text);
-      letter-spacing: -0.02em;
-      line-height: 1.1;
-    }
-    header p {
-      font-size: 13px;
-      color: var(--muted);
-      margin-top: 6px;
-    }
+    .hamburger { display: flex; flex-direction: column; gap: 5px; cursor: pointer; }
+    .hamburger span { display: block; width: 22px; height: 2.5px; background: var(--navy); border-radius: 2px; }
+    .hamburger span:last-child { width: 15px; }
 
-    /* ── Loan Type Tabs ── */
-    .tabs {
-      display: flex;
-      gap: 8px;
-      padding: 0 24px 20px;
-      overflow-x: auto;
-      scrollbar-width: none;
+    .currency-pill {
+      display: flex; align-items: center; gap: 6px;
+      background: var(--white); border: 1.5px solid var(--border);
+      border-radius: 100px; padding: 7px 14px;
+      font-size: 13px; font-weight: 700; color: var(--navy);
+      cursor: pointer; box-shadow: var(--shadow-sm); user-select: none;
     }
-    .tabs::-webkit-scrollbar { display: none; }
-    .tab {
-      flex-shrink: 0;
-      padding: 7px 16px;
-      border-radius: 100px;
-      font-size: 13px;
-      font-weight: 500;
-      border: 1px solid var(--border);
-      background: transparent;
-      color: var(--muted);
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .tab.active {
-      background: var(--accent);
-      border-color: var(--accent);
-      color: #0a0c12;
-    }
+    .currency-pill .chev { font-size: 9px; color: var(--muted); margin-left: 2px; }
 
-    /* ── Main Card ── */
-    .card {
-      margin: 0 16px 16px;
-      background: var(--card);
-      border: 1px solid var(--border);
+    /* ── Page title ── */
+    .heading { padding: 18px 22px 0; }
+    .heading p { font-size: 27px; font-weight: 400; color: var(--navy); line-height: 1.2; }
+    .heading h1 { font-size: 33px; font-weight: 900; color: var(--navy); line-height: 1.1; }
+
+    /* ── EMI Result Banner ── */
+    .emi-banner {
+      margin: 18px 16px 0;
+      background: var(--blue-light);
+      border: 1.5px solid var(--blue-border);
       border-radius: var(--radius);
-      padding: 24px;
-      backdrop-filter: blur(20px);
-    }
-
-    /* ── Inputs ── */
-    .field { margin-bottom: 24px; }
-    .field:last-child { margin-bottom: 0; }
-
-    .field-header {
+      padding: 20px 22px;
       display: flex;
+      align-items: center;
       justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
     }
-    .field-label {
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--muted);
-      letter-spacing: 0.01em;
+    .emi-left {}
+    .emi-label { font-size: 13px; font-weight: 600; color: var(--muted); margin-bottom: 4px; }
+    .emi-value {
+      font-size: 40px; font-weight: 900; color: var(--navy);
+      letter-spacing: -0.02em; line-height: 1;
+      transition: opacity 0.15s;
     }
-    .field-value {
-      font-family: 'Syne', sans-serif;
-      font-size: 17px;
-      font-weight: 700;
-      color: var(--text);
-    }
-    .field-unit {
-      font-size: 12px;
-      font-weight: 400;
-      color: var(--muted);
-      margin-left: 3px;
-    }
+    .emi-value .esym { font-size: 30px; margin-right: 3px; }
+    .emi-icon { font-size: 52px; line-height: 1; }
 
-    .number-input-row {
-      display: flex;
-      align-items: center;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 10px 14px;
-      margin-bottom: 10px;
-      gap: 8px;
+    /* ── Loan type ── */
+    .lt-label { padding: 20px 22px 10px; font-size: 15px; font-weight: 800; color: var(--navy); }
+    .lt-row {
+      display: flex; gap: 11px; padding: 0 22px 4px;
+      overflow-x: auto; scrollbar-width: none;
     }
-    .currency-badge {
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--accent);
-      min-width: 18px;
+    .lt-row::-webkit-scrollbar { display: none; }
+
+    .lt-card {
+      flex-shrink: 0; width: 92px;
+      background: var(--white); border: 2px solid transparent;
+      border-radius: var(--radius); padding: 13px 8px 11px;
+      text-align: center; cursor: pointer;
+      transition: all 0.18s; box-shadow: var(--shadow-sm);
+      position: relative;
     }
-    .number-input-row input[type="number"] {
-      flex: 1;
-      background: transparent;
-      border: none;
-      outline: none;
-      color: var(--text);
-      font-family: 'Syne', sans-serif;
-      font-size: 16px;
-      font-weight: 700;
+    .lt-card .lt-ico { font-size: 32px; display: block; margin-bottom: 6px; }
+    .lt-card .lt-nm  { font-size: 13px; font-weight: 700; color: var(--navy); }
+    .lt-card.active  { border-color: var(--purple); background: var(--purple-light); }
+    .lt-card.active .lt-nm { color: var(--purple); }
+    .lt-chk {
+      position: absolute; top: 7px; right: 7px;
+      width: 18px; height: 18px; background: var(--navy);
+      border-radius: 50%; display: none;
+      align-items: center; justify-content: center;
+      font-size: 9px; color: white; font-weight: 900;
+    }
+    .lt-card.active .lt-chk { display: flex; }
+
+    /* ── Fields ── */
+    .fields { padding: 16px 22px 0; }
+    .frow { margin-bottom: 20px; }
+    .ftop {
+      display: flex; align-items: center;
+      justify-content: space-between; margin-bottom: 10px;
+    }
+    .flbl { font-size: 14px; font-weight: 700; color: var(--navy); }
+
+    .fbox {
+      display: flex; align-items: center;
+      background: var(--white); border: 1.5px solid var(--border);
+      border-radius: 12px; padding: 8px 12px; gap: 5px;
+      box-shadow: var(--shadow-sm);
+    }
+    .fbox .fsym { font-size: 14px; font-weight: 700; color: var(--muted); white-space: nowrap; }
+    .fbox input[type="number"] {
+      border: none; outline: none;
+      font-family: 'Nunito', sans-serif;
+      font-size: 14px; font-weight: 700; color: var(--navy);
+      background: transparent; width: 80px; text-align: right;
       -moz-appearance: textfield;
     }
-    .number-input-row input[type="number"]::-webkit-inner-spin-button,
-    .number-input-row input[type="number"]::-webkit-outer-spin-button { display: none; }
-    .step-btns { display: flex; gap: 4px; }
-    .step-btn {
-      width: 28px; height: 28px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      background: var(--card);
-      color: var(--text);
-      font-size: 16px;
-      cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      transition: background 0.15s, border-color 0.15s;
-      line-height: 1;
-      padding-bottom: 1px;
-    }
-    .step-btn:active { background: var(--accent); border-color: var(--accent); color: #0a0c12; }
+    .fbox input::-webkit-inner-spin-button,
+    .fbox input::-webkit-outer-spin-button { display: none; }
 
-    /* Range Slider */
+    /* Tenure toggle */
+    .ten-right { display: flex; align-items: center; gap: 8px; }
+    .unit-toggle {
+      display: flex; background: var(--border);
+      border-radius: 10px; padding: 3px;
+    }
+    .ubtn {
+      padding: 4px 10px; font-size: 12px; font-weight: 800;
+      color: var(--muted); background: transparent;
+      border: none; border-radius: 8px; cursor: pointer;
+      font-family: 'Nunito', sans-serif; transition: all 0.18s;
+    }
+    .ubtn.active { background: var(--white); color: var(--purple); box-shadow: var(--shadow-sm); }
+
+    /* Slider */
     input[type="range"] {
-      -webkit-appearance: none;
-      width: 100%;
-      height: 4px;
-      border-radius: 99px;
-      outline: none;
-      cursor: pointer;
+      -webkit-appearance: none; width: 100%; height: 5px;
+      border-radius: 99px; outline: none; cursor: pointer;
     }
     input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 20px; height: 20px;
-      border-radius: 50%;
-      background: var(--accent);
-      box-shadow: 0 0 0 3px rgba(110,231,183,0.25);
-      cursor: pointer;
-      transition: box-shadow 0.2s;
-    }
-    input[type="range"]::-webkit-slider-thumb:active {
-      box-shadow: 0 0 0 6px rgba(110,231,183,0.3);
+      -webkit-appearance: none; width: 22px; height: 22px;
+      border-radius: 50%; background: var(--white);
+      border: 2.5px solid var(--purple);
+      box-shadow: 0 2px 8px rgba(124,92,191,0.28); cursor: pointer;
     }
     input[type="range"]::-moz-range-thumb {
-      width: 20px; height: 20px;
-      border-radius: 50%;
-      background: var(--accent);
-      cursor: pointer;
-      border: none;
+      width: 22px; height: 22px; border-radius: 50%;
+      background: var(--white); border: 2.5px solid var(--purple); cursor: pointer;
     }
 
-    .range-labels {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 6px;
-    }
-    .range-labels span {
-      font-size: 11px;
-      color: var(--muted);
-    }
-
-    /* ── Result Card ── */
-    .result-card {
-      margin: 0 16px 16px;
-      background: linear-gradient(135deg, rgba(110,231,183,0.12), rgba(56,189,248,0.08));
-      border: 1px solid rgba(110,231,183,0.2);
-      border-radius: var(--radius);
-      padding: 24px;
-      position: relative;
-      overflow: hidden;
-    }
-    .result-card::before {
-      content: '';
-      position: absolute;
-      top: -40px; right: -40px;
-      width: 150px; height: 150px;
-      background: radial-gradient(circle, rgba(110,231,183,0.15), transparent 70%);
-    }
-    .result-label {
-      font-size: 12px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--accent);
-      font-weight: 500;
-      margin-bottom: 4px;
-    }
-    .result-emi {
-      font-family: 'Syne', sans-serif;
-      font-size: 42px;
-      font-weight: 800;
-      color: var(--text);
-      letter-spacing: -0.03em;
-      line-height: 1;
-    }
-    .result-emi .currency-sym { font-size: 26px; vertical-align: super; margin-right: 2px; opacity: 0.6; }
-    .result-sub {
-      font-size: 12px;
-      color: var(--muted);
-      margin-top: 4px;
-    }
-
-    /* ── Breakdown Row ── */
+    /* ── Breakdown ── */
     .breakdown {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 10px;
-      margin: 0 16px 16px;
-    }
-    .breakdown-item {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 14px 12px;
-    }
-    .breakdown-item .bi-label {
-      font-size: 11px;
-      color: var(--muted);
-      margin-bottom: 5px;
-      letter-spacing: 0.03em;
-    }
-    .breakdown-item .bi-val {
-      font-family: 'Syne', sans-serif;
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--text);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .breakdown-item .bi-val.green { color: var(--accent); }
-    .breakdown-item .bi-val.blue { color: var(--accent2); }
-    .breakdown-item .bi-val.pink { color: var(--accent3); }
-
-    /* ── Donut Chart ── */
-    .chart-card {
-      margin: 0 16px 16px;
-      background: var(--card);
-      border: 1px solid var(--border);
+      margin: 8px 16px 0;
+      background: var(--white);
       border-radius: var(--radius);
-      padding: 24px;
+      padding: 18px 20px;
+      box-shadow: var(--shadow);
     }
-    .chart-title {
-      font-family: 'Syne', sans-serif;
-      font-size: 15px;
-      font-weight: 700;
-      margin-bottom: 20px;
-      color: var(--text);
+    .bk-title { font-size: 14px; font-weight: 800; color: var(--navy); margin-bottom: 14px; }
+    .bk-donut-row {
+      display: flex; align-items: center; gap: 20px;
     }
-    .donut-wrap {
-      display: flex;
-      align-items: center;
-      gap: 24px;
+    .bk-donut { flex-shrink: 0; position: relative; width: 120px; height: 120px; }
+    .bk-donut svg { width: 120px; height: 120px; }
+    .bk-center {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
     }
-    .donut-svg { flex-shrink: 0; }
-    .donut-legend { flex: 1; }
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 12px;
-    }
-    .legend-dot {
-      width: 10px; height: 10px;
-      border-radius: 3px;
-      flex-shrink: 0;
-    }
-    .legend-info { flex: 1; }
-    .legend-name { font-size: 12px; color: var(--muted); }
-    .legend-amount {
-      font-family: 'Syne', sans-serif;
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--text);
-    }
-    .legend-pct {
-      font-size: 11px;
-      color: var(--muted);
-      margin-left: 4px;
-    }
+    .bk-c-lbl { font-size: 10px; color: var(--muted); font-weight: 700; }
+    .bk-c-val { font-size: 12px; font-weight: 900; color: var(--navy); }
 
-    /* ── Amortization Table ── */
-    .table-card {
-      margin: 0 16px 24px;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
-    }
-    .table-header {
-      padding: 18px 20px 14px;
-      display: flex;
-      align-items: center;
+    .bk-legend { flex: 1; }
+    .bk-leg-item {
+      display: flex; align-items: center;
       justify-content: space-between;
-      border-bottom: 1px solid var(--border);
+      margin-bottom: 10px;
     }
-    .table-title {
-      font-family: 'Syne', sans-serif;
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--text);
-    }
-    .toggle-table {
-      background: transparent;
-      border: 1px solid var(--border);
-      color: var(--muted);
-      font-size: 12px;
-      padding: 5px 12px;
-      border-radius: 100px;
-      cursor: pointer;
-      font-family: 'DM Sans', sans-serif;
-      transition: all 0.2s;
-    }
-    .toggle-table:hover { border-color: var(--accent); color: var(--accent); }
+    .bk-leg-item:last-child { margin-bottom: 0; }
+    .bk-leg-left { display: flex; align-items: center; gap: 8px; }
+    .bk-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+    .bk-leg-name { font-size: 12px; color: var(--muted); font-weight: 600; }
+    .bk-leg-val { font-size: 13px; font-weight: 800; color: var(--navy); }
 
-    .amortization-table { width: 100%; border-collapse: collapse; }
-    .amortization-table th {
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--muted);
-      padding: 10px 20px;
-      text-align: right;
-      border-bottom: 1px solid var(--border);
-      background: rgba(255,255,255,0.02);
+    /* ── Year Breakup accordion ── */
+    .yr-accordion {
+      margin: 10px 16px 0;
+      background: var(--white);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
     }
-    .amortization-table th:first-child { text-align: left; }
-    .amortization-table td {
-      font-size: 13px;
-      padding: 11px 20px;
-      text-align: right;
-      border-bottom: 1px solid rgba(255,255,255,0.04);
-      color: var(--text);
+    .yr-hdr {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 20px; cursor: pointer; user-select: none;
     }
-    .amortization-table td:first-child { text-align: left; color: var(--muted); }
-    .amortization-table tr:last-child td { border-bottom: none; }
-    .amortization-table tr:hover td { background: rgba(255,255,255,0.02); }
-    .td-interest { color: var(--accent3) !important; }
-    .td-principal { color: var(--accent2) !important; }
+    .yr-hdr span { font-size: 14px; font-weight: 800; color: var(--navy); }
+    .yr-chev { font-size: 13px; color: var(--muted); transition: transform 0.3s; }
+    .yr-accordion.open .yr-chev { transform: rotate(180deg); }
+    .yr-body { display: none; }
+    .yr-accordion.open .yr-body { display: block; }
 
-    /* ── Animations ── */
+    .yr-tbl { width: 100%; border-collapse: collapse; }
+    .yr-tbl th {
+      font-size: 11px; font-weight: 700; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.06em;
+      padding: 8px 16px; text-align: right;
+      background: var(--bg); border-top: 1px solid var(--border);
+    }
+    .yr-tbl th:first-child { text-align: left; }
+    .yr-tbl td {
+      font-size: 12px; font-weight: 700; padding: 10px 16px;
+      text-align: right; border-top: 1px solid var(--border); color: var(--navy);
+    }
+    .yr-tbl td:first-child { text-align: left; color: var(--muted); font-size: 12px; }
+    .yr-tbl td.cp { color: var(--purple); }
+    .yr-tbl td.ci { color: var(--pink); }
+
+    /* pulse on recalc */
+    @keyframes pulse {
+      0%   { opacity: 1; }
+      40%  { opacity: 0.4; }
+      100% { opacity: 1; }
+    }
+    .recalc { animation: pulse 0.3s ease; }
+
     @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(12px); }
-      to { opacity: 1; transform: translateY(0); }
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
-    .card, .result-card, .breakdown, .chart-card, .table-card {
-      animation: fadeUp 0.4s ease both;
-    }
-    .result-card { animation-delay: 0.05s; }
-    .breakdown { animation-delay: 0.1s; }
-    .chart-card { animation-delay: 0.15s; }
-    .table-card { animation-delay: 0.2s; }
-
-    /* ── Utility ── */
-    .hidden { display: none !important; }
-    .section-spacer { height: 8px; }
-
-    @media (max-width: 360px) {
-      .result-emi { font-size: 36px; }
-      .breakdown { grid-template-columns: 1fr 1fr; }
-    }
+    .emi-banner   { animation: fadeUp 0.35s ease both; }
+    .lt-label     { animation: fadeUp 0.35s 0.05s ease both; }
+    .lt-row       { animation: fadeUp 0.35s 0.08s ease both; }
+    .fields       { animation: fadeUp 0.35s 0.11s ease both; }
+    .breakdown    { animation: fadeUp 0.35s 0.16s ease both; }
+    .yr-accordion { animation: fadeUp 0.35s 0.2s ease both; }
   </style>
 </head>
 <body>
-
 <div class="app">
 
-  <header>
-    <div class="header-label">Finance Tool</div>
-    <h1>EMI Calculator</h1>
-    <p>Plan your loan repayments easily</p>
-  </header>
-
-  <!-- Loan Type Tabs -->
-  <div class="tabs">
-    <button class="tab active" onclick="setType(this,'Home Loan')">🏠 Home Loan</button>
-    <button class="tab" onclick="setType(this,'Car Loan')">🚗 Car Loan</button>
-    <button class="tab" onclick="setType(this,'Personal Loan')">💼 Personal</button>
-    <button class="tab" onclick="setType(this,'Education')">🎓 Education</button>
+  <!-- Top bar -->
+  <div class="topbar">
+    <div class="hamburger"><span></span><span></span><span></span></div>
+    <div class="currency-pill" onclick="cycleCurrency()">
+      <span id="flagEl">🇮🇳</span>
+      <span id="currLabel">INR</span>
+      <span class="chev">▼</span>
+    </div>
   </div>
 
-  <!-- Input Card -->
-  <div class="card">
+  <!-- Heading -->
+  <div class="heading">
+    <p>Loan EMI</p>
+    <h1>Calculator</h1>
+  </div>
+
+  <!-- ★ EMI Result Banner (always visible) -->
+  <div class="emi-banner">
+    <div class="emi-left">
+      <div class="emi-label">EMI per month</div>
+      <div class="emi-value" id="emiVal">
+        <span class="esym" id="emiSym">₹</span><span id="emiNum">7,753</span>
+      </div>
+    </div>
+    <div class="emi-icon" id="emiIcon">🏠</div>
+  </div>
+
+  <!-- Loan Type -->
+  <div class="lt-label">Select loan type</div>
+  <div class="lt-row">
+    <div class="lt-card active" onclick="pickLoan(this,'🏠')">
+      <span class="lt-ico">🏠</span><div class="lt-nm">Home</div><div class="lt-chk">✓</div>
+    </div>
+    <div class="lt-card" onclick="pickLoan(this,'🚗')">
+      <span class="lt-ico">🚗</span><div class="lt-nm">Vehicle</div><div class="lt-chk">✓</div>
+    </div>
+    <div class="lt-card" onclick="pickLoan(this,'💼')">
+      <span class="lt-ico">💼</span><div class="lt-nm">Personal</div><div class="lt-chk">✓</div>
+    </div>
+    <div class="lt-card" onclick="pickLoan(this,'🎓')">
+      <span class="lt-ico">🎓</span><div class="lt-nm">Education</div><div class="lt-chk">✓</div>
+    </div>
+  </div>
+
+  <!-- Fields -->
+  <div class="fields">
 
     <!-- Loan Amount -->
-    <div class="field">
-      <div class="field-header">
-        <span class="field-label">Loan Amount</span>
-        <span class="field-value" id="amountDisplay">₹10,00,000<span class="field-unit"></span></span>
-      </div>
-      <div class="number-input-row">
-        <span class="currency-badge">₹</span>
-        <input type="number" id="amountInput" value="1000000" min="10000" max="100000000" step="10000"
-          oninput="syncFromInput('amount')" />
-        <div class="step-btns">
-          <button class="step-btn" onclick="step('amount',-1)">−</button>
-          <button class="step-btn" onclick="step('amount',1)">+</button>
+    <div class="frow">
+      <div class="ftop">
+        <label class="flbl">Loan Amount</label>
+        <div class="fbox">
+          <span class="fsym" id="sym1">₹</span>
+          <input type="number" id="amtIn" value="800000" min="10000" max="100000000" step="10000"
+            oninput="onIn('amt')" onchange="clamp('amt')"/>
         </div>
       </div>
-      <input type="range" id="amountRange" min="10000" max="10000000" step="10000" value="1000000"
-        oninput="syncFromRange('amount')" />
-      <div class="range-labels"><span>₹10K</span><span>₹1Cr</span></div>
+      <input type="range" id="amtRng" min="10000" max="10000000" step="10000" value="800000"
+        oninput="onRng('amt')"/>
     </div>
 
-    <!-- Interest Rate -->
-    <div class="field">
-      <div class="field-header">
-        <span class="field-label">Interest Rate</span>
-        <span class="field-value" id="rateDisplay">8.5<span class="field-unit">% p.a.</span></span>
-      </div>
-      <div class="number-input-row">
-        <span class="currency-badge">%</span>
-        <input type="number" id="rateInput" value="8.5" min="1" max="30" step="0.1"
-          oninput="syncFromInput('rate')" />
-        <div class="step-btns">
-          <button class="step-btn" onclick="step('rate',-1)">−</button>
-          <button class="step-btn" onclick="step('rate',1)">+</button>
+    <!-- Down Payment -->
+    <div class="frow">
+      <div class="ftop">
+        <label class="flbl">Down Payment</label>
+        <div class="fbox">
+          <span class="fsym" id="sym2">₹</span>
+          <input type="number" id="downIn" value="100000" min="0" max="10000000" step="10000"
+            oninput="onIn('down')" onchange="clamp('down')"/>
         </div>
       </div>
-      <input type="range" id="rateRange" min="1" max="30" step="0.1" value="8.5"
-        oninput="syncFromRange('rate')" />
-      <div class="range-labels"><span>1%</span><span>30%</span></div>
+      <input type="range" id="downRng" min="0" max="5000000" step="10000" value="100000"
+        oninput="onRng('down')"/>
     </div>
 
     <!-- Tenure -->
-    <div class="field">
-      <div class="field-header">
-        <span class="field-label">Loan Tenure</span>
-        <span class="field-value" id="tenureDisplay">20<span class="field-unit"> Yr</span></span>
-      </div>
-      <div class="number-input-row">
-        <span class="currency-badge">Yr</span>
-        <input type="number" id="tenureInput" value="20" min="1" max="30" step="1"
-          oninput="syncFromInput('tenure')" />
-        <div class="step-btns">
-          <button class="step-btn" onclick="step('tenure',-1)">−</button>
-          <button class="step-btn" onclick="step('tenure',1)">+</button>
+    <div class="frow">
+      <div class="ftop">
+        <label class="flbl">Tenure</label>
+        <div class="ten-right">
+          <div class="fbox">
+            <input type="number" id="tenIn" value="12" min="1" max="360" step="1"
+              oninput="onIn('ten')" onchange="clamp('ten')"/>
+            <span class="fsym" id="tenUnitLbl" style="color:var(--purple);font-size:12px">Mo</span>
+          </div>
+          <div class="unit-toggle">
+            <button class="ubtn active" id="btnMo" onclick="setUnit('months')">Mo</button>
+            <button class="ubtn"        id="btnYr"  onclick="setUnit('years')">Yr</button>
+          </div>
         </div>
       </div>
-      <input type="range" id="tenureRange" min="1" max="30" step="1" value="20"
-        oninput="syncFromRange('tenure')" />
-      <div class="range-labels"><span>1 Yr</span><span>30 Yr</span></div>
+      <input type="range" id="tenRng" min="1" max="360" step="1" value="12" oninput="onRng('ten')"/>
+    </div>
+
+    <!-- Interest Rate -->
+    <div class="frow">
+      <div class="ftop">
+        <label class="flbl">Interest Rate</label>
+        <div class="fbox">
+          <input type="number" id="rateIn" value="8.5" min="0.1" max="30" step="0.1"
+            oninput="onIn('rate')" onchange="clamp('rate')"/>
+          <span class="fsym">%</span>
+        </div>
+      </div>
+      <input type="range" id="rateRng" min="0.1" max="30" step="0.1" value="8.5"
+        oninput="onRng('rate')"/>
     </div>
 
   </div>
 
-  <!-- Result Card -->
-  <div class="result-card">
-    <div class="result-label">Monthly EMI</div>
-    <div class="result-emi"><span class="currency-sym">₹</span><span id="emiValue">8,678</span></div>
-    <div class="result-sub" id="emiSubtitle">For 240 months · Starts next month</div>
-  </div>
-
-  <!-- Breakdown -->
+  <!-- Breakdown card with donut -->
   <div class="breakdown">
-    <div class="breakdown-item">
-      <div class="bi-label">Principal</div>
-      <div class="bi-val green" id="principalVal">₹10L</div>
-    </div>
-    <div class="breakdown-item">
-      <div class="bi-label">Interest</div>
-      <div class="bi-val pink" id="interestVal">₹10.8L</div>
-    </div>
-    <div class="breakdown-item">
-      <div class="bi-label">Total</div>
-      <div class="bi-val blue" id="totalVal">₹20.8L</div>
-    </div>
-  </div>
-
-  <!-- Donut Chart -->
-  <div class="chart-card">
-    <div class="chart-title">Payment Breakdown</div>
-    <div class="donut-wrap">
-      <svg class="donut-svg" width="120" height="120" viewBox="0 0 120 120" id="donutSvg">
-        <circle cx="60" cy="60" r="46" fill="none" stroke="#1e2234" stroke-width="18"/>
-        <circle id="donutInterest" cx="60" cy="60" r="46" fill="none" stroke="#f472b6" stroke-width="18"
-          stroke-linecap="round" stroke-dasharray="0 289" transform="rotate(-90 60 60)" style="transition:stroke-dasharray 0.6s ease"/>
-        <circle id="donutPrincipal" cx="60" cy="60" r="46" fill="none" stroke="#38bdf8" stroke-width="18"
-          stroke-linecap="round" stroke-dasharray="0 289" transform="rotate(-90 60 60)" style="transition:stroke-dasharray 0.6s ease"/>
-      </svg>
-      <div class="donut-legend">
-        <div class="legend-item">
-          <div class="legend-dot" style="background:#38bdf8"></div>
-          <div class="legend-info">
-            <div class="legend-name">Principal Amount</div>
-            <div class="legend-amount" id="legendPrincipal">₹10,00,000<span class="legend-pct" id="pctPrincipal">(48%)</span></div>
-          </div>
+    <div class="bk-title">Payment Breakdown</div>
+    <div class="bk-donut-row">
+      <div class="bk-donut">
+        <svg viewBox="0 0 120 120">
+          <circle cx="60" cy="60" r="44" fill="none" stroke="#eeeef8" stroke-width="18"/>
+          <circle id="dP" cx="60" cy="60" r="44" fill="none" stroke="#7c5cbf" stroke-width="18"
+            stroke-dasharray="0 277" transform="rotate(-90 60 60)"
+            style="transition:stroke-dasharray 0.5s cubic-bezier(0.4,0,0.2,1)"/>
+          <circle id="dI" cx="60" cy="60" r="44" fill="none" stroke="#e84db8" stroke-width="18"
+            stroke-dasharray="0 277" transform="rotate(-90 60 60)"
+            style="transition:stroke-dasharray 0.5s cubic-bezier(0.4,0,0.2,1)"/>
+          <circle id="dD" cx="60" cy="60" r="44" fill="none" stroke="#4db8e8" stroke-width="18"
+            stroke-dasharray="0 277" transform="rotate(-90 60 60)"
+            style="transition:stroke-dasharray 0.5s cubic-bezier(0.4,0,0.2,1)"/>
+        </svg>
+        <div class="bk-center">
+          <div class="bk-c-lbl">Total</div>
+          <div class="bk-c-val" id="dCenter">—</div>
         </div>
-        <div class="legend-item">
-          <div class="legend-dot" style="background:#f472b6"></div>
-          <div class="legend-info">
-            <div class="legend-name">Total Interest</div>
-            <div class="legend-amount" id="legendInterest">₹10,82,720<span class="legend-pct" id="pctInterest">(52%)</span></div>
+      </div>
+      <div class="bk-legend">
+        <div class="bk-leg-item">
+          <div class="bk-leg-left">
+            <div class="bk-dot" style="background:#7c5cbf"></div>
+            <span class="bk-leg-name">Principal</span>
           </div>
+          <span class="bk-leg-val" id="lgP">—</span>
         </div>
-        <div class="legend-item">
-          <div class="legend-dot" style="background:#6ee7b7"></div>
-          <div class="legend-info">
-            <div class="legend-name">Total Payable</div>
-            <div class="legend-amount" id="legendTotal">₹20,82,720</div>
+        <div class="bk-leg-item">
+          <div class="bk-leg-left">
+            <div class="bk-dot" style="background:#e84db8"></div>
+            <span class="bk-leg-name">Interest</span>
           </div>
+          <span class="bk-leg-val" id="lgI">—</span>
+        </div>
+        <div class="bk-leg-item">
+          <div class="bk-leg-left">
+            <div class="bk-dot" style="background:#4db8e8"></div>
+            <span class="bk-leg-name">Total Paid</span>
+          </div>
+          <span class="bk-leg-val" id="lgT">—</span>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Amortization Table -->
-  <div class="table-card">
-    <div class="table-header">
-      <div class="table-title">Year-wise Schedule</div>
-      <button class="toggle-table" id="toggleBtn" onclick="toggleTable()">Show</button>
+  <!-- Year Breakup -->
+  <div class="yr-accordion" id="yrAcc">
+    <div class="yr-hdr" onclick="toggleYr()">
+      <span>View Year Breakup</span>
+      <span class="yr-chev">▼</span>
     </div>
-    <div id="tableWrap" class="hidden">
-      <table class="amortization-table">
+    <div class="yr-body">
+      <table class="yr-tbl">
         <thead>
-          <tr>
-            <th>Year</th>
-            <th>Principal</th>
-            <th>Interest</th>
-            <th>Balance</th>
-          </tr>
+          <tr><th>Year</th><th>Principal</th><th>Interest</th><th>Balance</th></tr>
         </thead>
-        <tbody id="tableBody"></tbody>
+        <tbody id="yrBody"></tbody>
       </table>
     </div>
   </div>
 
-</div>
+</div><!-- /app -->
 
 <script>
-  // ── State ──
-  const state = {
-    amount: 1000000,
-    rate: 8.5,
-    tenure: 20,
-    type: 'Home Loan'
-  };
+  const CURRENCIES = [
+    {flag:'🇮🇳', label:'INR', sym:'₹'},
+    {flag:'🇺🇸', label:'USD', sym:'$'},
+    {flag:'🇬🇧', label:'GBP', sym:'£'},
+    {flag:'🇪🇺', label:'EUR', sym:'€'},
+  ];
+  let curIdx = 0;
+  let loanIcon = '🏠';
+  let tenUnit = 'months';
 
-  // ── Sync helpers ──
-  function syncFromRange(field) {
-    const val = parseFloat(document.getElementById(field + 'Range').value);
-    state[field] = val;
-    document.getElementById(field + 'Input').value = val;
-    calculate();
+  const sym = () => CURRENCIES[curIdx].sym;
+
+  function cycleCurrency() {
+    curIdx = (curIdx + 1) % CURRENCIES.length;
+    document.getElementById('flagEl').textContent = CURRENCIES[curIdx].flag;
+    document.getElementById('currLabel').textContent = CURRENCIES[curIdx].label;
+    document.getElementById('sym1').textContent = sym();
+    document.getElementById('sym2').textContent = sym();
+    document.getElementById('emiSym').textContent = sym();
+    recalc();
   }
-  function syncFromInput(field) {
-    const el = document.getElementById(field + 'Input');
-    let val = parseFloat(el.value);
-    const rangeEl = document.getElementById(field + 'Range');
-    if (isNaN(val)) return;
-    val = Math.min(Math.max(val, parseFloat(rangeEl.min)), parseFloat(rangeEl.max));
-    state[field] = val;
-    rangeEl.value = val;
-    calculate();
-  }
-  function step(field, dir) {
-    const el = document.getElementById(field + 'Input');
-    const step = parseFloat(el.step) || 1;
-    el.value = parseFloat(el.value) + dir * step;
-    syncFromInput(field);
-  }
-  function setType(el, type) {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+
+  function pickLoan(el, icon) {
+    document.querySelectorAll('.lt-card').forEach(c => c.classList.remove('active'));
     el.classList.add('active');
-    state.type = type;
+    loanIcon = icon;
+    document.getElementById('emiIcon').textContent = icon;
   }
 
-  // ── Core EMI Calculation ──
-  function calcEMI(P, annualRate, years) {
-    const r = annualRate / 12 / 100;
-    const n = years * 12;
-    if (r === 0) return P / n;
-    return P * r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1);
+  function setUnit(u) {
+    tenUnit = u;
+    const inp = document.getElementById('tenIn');
+    const rng = document.getElementById('tenRng');
+    const cur = parseInt(inp.value) || 1;
+    if (u === 'months') {
+      document.getElementById('btnMo').classList.add('active');
+      document.getElementById('btnYr').classList.remove('active');
+      document.getElementById('tenUnitLbl').textContent = 'Mo';
+      rng.max = 360; rng.step = 1;
+      const v = Math.min(cur * 12, 360);
+      inp.value = v; rng.value = v;
+    } else {
+      document.getElementById('btnYr').classList.add('active');
+      document.getElementById('btnMo').classList.remove('active');
+      document.getElementById('tenUnitLbl').textContent = 'Yr';
+      rng.max = 30; rng.step = 1;
+      const v = Math.max(1, Math.round(cur / 12));
+      inp.value = v; rng.value = v;
+    }
+    grad('ten'); recalc();
   }
 
-  function fmtINR(n) {
-    return new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(Math.round(n));
+  // Slider ↔ input sync
+  function onRng(f) {
+    document.getElementById(f+'In').value = document.getElementById(f+'Rng').value;
+    grad(f); recalc();
   }
-  function fmtShort(n) {
-    if (n >= 10000000) return '₹' + (n / 10000000).toFixed(1) + 'Cr';
-    if (n >= 100000) return '₹' + (n / 100000).toFixed(1) + 'L';
-    if (n >= 1000) return '₹' + (n / 1000).toFixed(1) + 'K';
-    return '₹' + Math.round(n);
+  function onIn(f) {
+    const inp = document.getElementById(f+'In');
+    const rng = document.getElementById(f+'Rng');
+    const v = parseFloat(inp.value);
+    if (!isNaN(v)) {
+      const clamped = Math.min(Math.max(v, parseFloat(rng.min)), parseFloat(rng.max));
+      rng.value = clamped;
+    }
+    grad(f); recalc();
   }
-
-  // Gradient on range
-  function updateRangeGradient(field) {
-    const el = document.getElementById(field + 'Range');
-    const min = parseFloat(el.min), max = parseFloat(el.max), val = parseFloat(el.value);
-    const pct = ((val - min) / (max - min)) * 100;
-    el.style.background = `linear-gradient(to right, #6ee7b7 0%, #6ee7b7 ${pct}%, #1e2234 ${pct}%, #1e2234 100%)`;
+  function clamp(f) {
+    const inp = document.getElementById(f+'In');
+    const rng = document.getElementById(f+'Rng');
+    let v = parseFloat(inp.value);
+    if (isNaN(v)) v = parseFloat(rng.min);
+    v = Math.min(Math.max(v, parseFloat(rng.min)), parseFloat(rng.max));
+    inp.value = v; rng.value = v;
+    grad(f); recalc();
   }
-
-  function calculate() {
-    const { amount, rate, tenure } = state;
-    const emi = calcEMI(amount, rate, tenure);
-    const totalPayment = emi * tenure * 12;
-    const totalInterest = totalPayment - amount;
-    const months = tenure * 12;
-    const pctPrincipal = Math.round((amount / totalPayment) * 100);
-    const pctInterest = 100 - pctPrincipal;
-
-    // Update EMI display
-    document.getElementById('emiValue').textContent = fmtINR(emi);
-    document.getElementById('emiSubtitle').textContent = `For ${months} months · Starts next month`;
-
-    // Breakdown
-    document.getElementById('principalVal').textContent = fmtShort(amount);
-    document.getElementById('interestVal').textContent = fmtShort(totalInterest);
-    document.getElementById('totalVal').textContent = fmtShort(totalPayment);
-
-    // Amount display
-    document.getElementById('amountDisplay').innerHTML = fmtShort(amount);
-    document.getElementById('rateDisplay').innerHTML = `${rate}<span class="field-unit">% p.a.</span>`;
-    document.getElementById('tenureDisplay').innerHTML = `${tenure}<span class="field-unit"> Yr</span>`;
-
-    // Legend
-    document.getElementById('legendPrincipal').innerHTML = `₹${fmtINR(amount)}<span class="legend-pct">(${pctPrincipal}%)</span>`;
-    document.getElementById('legendInterest').innerHTML = `₹${fmtINR(totalInterest)}<span class="legend-pct">(${pctInterest}%)</span>`;
-    document.getElementById('legendTotal').innerHTML = `₹${fmtINR(totalPayment)}`;
-
-    // Donut chart (circumference = 2πr = 2*π*46 ≈ 289)
-    const circ = 2 * Math.PI * 46;
-    const pSlice = (pctPrincipal / 100) * circ;
-    const iSlice = (pctInterest / 100) * circ;
-    // Principal arc first, then interest offset
-    const pEl = document.getElementById('donutPrincipal');
-    const iEl = document.getElementById('donutInterest');
-    pEl.setAttribute('stroke-dasharray', `${pSlice} ${circ - pSlice}`);
-    pEl.setAttribute('stroke-dashoffset', '0');
-    iEl.setAttribute('stroke-dasharray', `${iSlice} ${circ - iSlice}`);
-    iEl.setAttribute('stroke-dashoffset', `${-pSlice}`);
-
-    // Range gradients
-    updateRangeGradient('amount');
-    updateRangeGradient('rate');
-    updateRangeGradient('tenure');
-
-    // Amortization table
-    buildAmortTable(amount, rate, tenure, emi);
+  function grad(f) {
+    const el = document.getElementById(f+'Rng');
+    const pct = ((el.value - el.min) / (el.max - el.min)) * 100;
+    el.style.background = `linear-gradient(to right,#7c5cbf 0%,#7c5cbf ${pct}%,#e2e4f3 ${pct}%,#e2e4f3 100%)`;
   }
 
-  function buildAmortTable(P, annualRate, years, emi) {
-    const r = annualRate / 12 / 100;
-    let balance = P;
-    const tbody = document.getElementById('tableBody');
+  // EMI formula
+  function calcEMI(P, annRate, months) {
+    const r = annRate / 12 / 100;
+    if (r === 0) return P / months;
+    return P * r * Math.pow(1+r, months) / (Math.pow(1+r, months) - 1);
+  }
+  function fmt(n)  { return new Intl.NumberFormat('en-IN',{maximumFractionDigits:0}).format(Math.round(n)); }
+  function fmtS(n) {
+    if (n>=10000000) return (n/10000000).toFixed(1)+'Cr';
+    if (n>=100000)   return (n/100000).toFixed(1)+'L';
+    if (n>=1000)     return (n/1000).toFixed(1)+'K';
+    return Math.round(n).toString();
+  }
+
+  function recalc() {
+    const loanAmt = parseFloat(document.getElementById('amtIn').value)  || 0;
+    const downAmt = parseFloat(document.getElementById('downIn').value) || 0;
+    const tenRaw  = parseFloat(document.getElementById('tenIn').value)  || 1;
+    const rate    = parseFloat(document.getElementById('rateIn').value) || 0;
+
+    const months  = tenUnit === 'months' ? tenRaw : tenRaw * 12;
+    const P       = Math.max(loanAmt - downAmt, 0);
+    const monthly = calcEMI(P, rate, months);
+    const totalPaid = monthly * months;
+    const interest  = totalPaid - P;
+    const grand     = totalPaid + downAmt;
+    const s = sym();
+
+    // EMI banner
+    const emiEl = document.getElementById('emiNum');
+    emiEl.textContent = fmt(monthly);
+    emiEl.classList.remove('recalc');
+    void emiEl.offsetWidth;
+    emiEl.classList.add('recalc');
+
+    // Donut (r=44, circ≈276.5)
+    const C = 2 * Math.PI * 44;
+    const total = P + interest + downAmt;
+    const safeTotal = total || 1;
+    const pSlice = (P / safeTotal) * C;
+    const iSlice = (interest / safeTotal) * C;
+    const dSlice = (downAmt / safeTotal) * C;
+
+    const dp = document.getElementById('dP');
+    const di = document.getElementById('dI');
+    const dd = document.getElementById('dD');
+    dp.setAttribute('stroke-dasharray', `${pSlice} ${C - pSlice}`);
+    dp.style.strokeDashoffset = 0;
+    di.setAttribute('stroke-dasharray', `${iSlice} ${C - iSlice}`);
+    di.style.strokeDashoffset = -pSlice;
+    dd.setAttribute('stroke-dasharray', `${dSlice} ${C - dSlice}`);
+    dd.style.strokeDashoffset = -(pSlice + iSlice);
+
+    document.getElementById('dCenter').textContent = s + fmtS(grand);
+    document.getElementById('lgP').textContent = s + fmt(P);
+    document.getElementById('lgI').textContent = s + fmt(interest);
+    document.getElementById('lgT').textContent = s + fmt(grand);
+
+    // Year table
+    buildTable(P, rate, months, monthly);
+  }
+
+  function buildTable(P, annRate, totalMonths, monthly) {
+    const r = annRate / 12 / 100;
+    let bal = P;
+    const tbody = document.getElementById('yrBody');
     tbody.innerHTML = '';
+    const years = Math.ceil(totalMonths / 12);
+    const s = sym();
     for (let y = 1; y <= years; y++) {
-      let yearPrincipal = 0, yearInterest = 0;
-      for (let m = 0; m < 12; m++) {
-        if (balance <= 0) break;
-        const interest = balance * r;
-        const principal = Math.min(emi - interest, balance);
-        yearInterest += interest;
-        yearPrincipal += principal;
-        balance -= principal;
+      let yP = 0, yI = 0;
+      const mo = Math.min(12, totalMonths - (y-1)*12);
+      for (let m = 0; m < mo; m++) {
+        if (bal <= 0) break;
+        const iAmt = bal * r;
+        const pAmt = Math.min(monthly - iAmt, bal);
+        yI += iAmt; yP += pAmt; bal -= pAmt;
       }
       const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>Yr ${y}</td>
-        <td class="td-principal">₹${fmtINR(yearPrincipal)}</td>
-        <td class="td-interest">₹${fmtINR(yearInterest)}</td>
-        <td>₹${fmtINR(Math.max(balance, 0))}</td>
-      `;
+      tr.innerHTML = `<td>Yr ${y}</td><td class="cp">${s}${fmt(yP)}</td><td class="ci">${s}${fmt(yI)}</td><td>${s}${fmt(Math.max(bal,0))}</td>`;
       tbody.appendChild(tr);
     }
   }
 
-  let tableVisible = false;
-  function toggleTable() {
-    tableVisible = !tableVisible;
-    document.getElementById('tableWrap').classList.toggle('hidden', !tableVisible);
-    document.getElementById('toggleBtn').textContent = tableVisible ? 'Hide' : 'Show';
+  function toggleYr() {
+    document.getElementById('yrAcc').classList.toggle('open');
   }
 
-  // ── Init ──
-  calculate();
+  // Boot
+  document.getElementById('sym1').textContent = sym();
+  document.getElementById('sym2').textContent = sym();
+  document.getElementById('emiSym').textContent = sym();
+  ['amt','down','ten','rate'].forEach(f => grad(f));
+  recalc();
 
-  // ── Service Worker (offline PWA) ──
   if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js').catch(() => {});
-    });
+    window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(()=>{}));
   }
 </script>
-
 </body>
 </html>
