@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
   <meta name="apple-mobile-web-app-title" content="EMI Calc"/>
-  <meta name="theme-color" content="#eef0fb"/>
-  <title>Loan EMI Calculator</title>
+  <meta name="theme-color" content="#eef0fb" id="themeColor"/>
+  <title>Sirat's EMI Calculator</title>
   <link rel="manifest" href="manifest.json"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
@@ -15,20 +15,42 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    :root {
-      --bg: #eef0fb;
-      --white: #ffffff;
-      --border: #e2e4f3;
-      --navy: #1a1d3b;
-      --purple: #7c5cbf;
+    /* ── Light theme ── */
+    :root, [data-theme="light"] {
+      --bg:           #eef0fb;
+      --white:        #ffffff;
+      --card:         #ffffff;
+      --border:       #e2e4f3;
+      --navy:         #1a1d3b;
+      --purple:       #7c5cbf;
       --purple-light: #ede8f8;
-      --blue-light: #dff3fc;
-      --blue-border: rgba(77,184,232,0.25);
-      --pink: #e84db8;
-      --muted: #8b90b0;
-      --radius: 20px;
-      --shadow: 0 4px 20px rgba(100,100,180,0.10);
-      --shadow-sm: 0 2px 10px rgba(100,100,180,0.08);
+      --blue-light:   #dff3fc;
+      --blue-border:  rgba(77,184,232,0.25);
+      --pink:         #e84db8;
+      --muted:        #8b90b0;
+      --tab-bg:       #e2e4f3;
+      --shadow:       0 4px 20px rgba(100,100,180,0.10);
+      --shadow-sm:    0 2px 10px rgba(100,100,180,0.08);
+      --tbl-alt:      #f5f6fd;
+    }
+
+    /* ── Dark theme ── */
+    [data-theme="dark"] {
+      --bg:           #0e0f1a;
+      --white:        #181b2e;
+      --card:         #1e2235;
+      --border:       #2a2e4a;
+      --navy:         #e8eaf6;
+      --purple:       #a07fe0;
+      --purple-light: #2a2245;
+      --blue-light:   #0e2133;
+      --blue-border:  rgba(77,184,232,0.18);
+      --pink:         #f472c8;
+      --muted:        #6b7299;
+      --tab-bg:       #2a2e4a;
+      --shadow:       0 4px 24px rgba(0,0,0,0.35);
+      --shadow-sm:    0 2px 12px rgba(0,0,0,0.25);
+      --tbl-alt:      #161929;
     }
 
     html, body {
@@ -37,13 +59,14 @@
       background: var(--bg);
       color: var(--navy);
       -webkit-font-smoothing: antialiased;
+      transition: background 0.3s, color 0.3s;
     }
 
     .app {
       width: 100%;
       max-width: 430px;
       margin: 0 auto;
-      padding: env(safe-area-inset-top, 0px) 0 calc(env(safe-area-inset-bottom, 0px) + 28px);
+      padding: env(safe-area-inset-top, 0px) 0 calc(env(safe-area-inset-bottom, 0px) + 32px);
     }
 
     /* ── Top bar ── */
@@ -51,63 +74,74 @@
       display: flex; align-items: center; justify-content: space-between;
       padding: 52px 22px 0;
     }
-    .hamburger { display: flex; flex-direction: column; gap: 5px; cursor: pointer; }
-    .hamburger span { display: block; width: 22px; height: 2.5px; background: var(--navy); border-radius: 2px; }
-    .hamburger span:last-child { width: 15px; }
+
+    /* Theme toggle */
+    .theme-toggle {
+      width: 52px; height: 28px;
+      background: var(--tab-bg);
+      border-radius: 100px; border: 1.5px solid var(--border);
+      cursor: pointer; position: relative;
+      transition: background 0.3s, border-color 0.3s;
+      flex-shrink: 0;
+    }
+    .theme-toggle .knob {
+      position: absolute; top: 3px; left: 3px;
+      width: 20px; height: 20px;
+      background: var(--white);
+      border-radius: 50%;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px;
+    }
+    [data-theme="dark"] .theme-toggle .knob { transform: translateX(24px); }
+    [data-theme="dark"] .theme-toggle { background: #2a2e4a; border-color: #3a3f60; }
 
     .currency-pill {
       display: flex; align-items: center; gap: 6px;
-      background: var(--white); border: 1.5px solid var(--border);
+      background: var(--card); border: 1.5px solid var(--border);
       border-radius: 100px; padding: 7px 14px;
       font-size: 13px; font-weight: 700; color: var(--navy);
       cursor: pointer; box-shadow: var(--shadow-sm); user-select: none;
+      transition: background 0.3s, border-color 0.3s, color 0.3s;
     }
     .currency-pill .chev { font-size: 9px; color: var(--muted); margin-left: 2px; }
 
-    /* ── Page title ── */
+    /* ── Heading ── */
     .heading { padding: 18px 22px 0; }
-    .heading p { font-size: 27px; font-weight: 400; color: var(--navy); line-height: 1.2; }
-    .heading h1 { font-size: 33px; font-weight: 900; color: var(--navy); line-height: 1.1; }
+    .heading p { font-size: 14px; font-weight: 700; color: var(--muted); letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 2px; }
+    .heading h1 { font-size: 33px; font-weight: 900; color: var(--navy); line-height: 1.1; transition: color 0.3s; }
 
-    /* ── EMI Result Banner ── */
+    /* ── EMI Banner ── */
     .emi-banner {
       margin: 18px 16px 0;
       background: var(--blue-light);
       border: 1.5px solid var(--blue-border);
-      border-radius: var(--radius);
+      border-radius: 20px;
       padding: 20px 22px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      display: flex; align-items: center; justify-content: space-between;
+      transition: background 0.3s, border-color 0.3s;
     }
-    .emi-left {}
-    .emi-label { font-size: 13px; font-weight: 600; color: var(--muted); margin-bottom: 4px; }
-    .emi-value {
-      font-size: 40px; font-weight: 900; color: var(--navy);
-      letter-spacing: -0.02em; line-height: 1;
-      transition: opacity 0.15s;
-    }
-    .emi-value .esym { font-size: 30px; margin-right: 3px; }
+    .emi-label { font-size: 13px; font-weight: 600; color: var(--muted); margin-bottom: 5px; }
+    .emi-value { font-size: 40px; font-weight: 900; color: var(--navy); letter-spacing: -0.02em; line-height: 1; transition: color 0.3s; }
+    .emi-value .esym { font-size: 30px; margin-right: 2px; }
     .emi-icon { font-size: 52px; line-height: 1; }
 
-    /* ── Loan type ── */
-    .lt-label { padding: 20px 22px 10px; font-size: 15px; font-weight: 800; color: var(--navy); }
-    .lt-row {
-      display: flex; gap: 11px; padding: 0 22px 4px;
-      overflow-x: auto; scrollbar-width: none;
-    }
+    /* ── Loan types ── */
+    .lt-label { padding: 20px 22px 10px; font-size: 15px; font-weight: 800; color: var(--navy); transition: color 0.3s; }
+    .lt-row { display: flex; gap: 11px; padding: 0 22px 4px; overflow-x: auto; scrollbar-width: none; }
     .lt-row::-webkit-scrollbar { display: none; }
 
     .lt-card {
-      flex-shrink: 0; width: 92px;
-      background: var(--white); border: 2px solid transparent;
-      border-radius: var(--radius); padding: 13px 8px 11px;
+      flex-shrink: 0; width: 94px;
+      background: var(--card); border: 2px solid transparent;
+      border-radius: 20px; padding: 13px 8px 11px;
       text-align: center; cursor: pointer;
       transition: all 0.18s; box-shadow: var(--shadow-sm);
       position: relative;
     }
     .lt-card .lt-ico { font-size: 32px; display: block; margin-bottom: 6px; }
-    .lt-card .lt-nm  { font-size: 13px; font-weight: 700; color: var(--navy); }
+    .lt-card .lt-nm  { font-size: 13px; font-weight: 700; color: var(--navy); transition: color 0.3s; }
     .lt-card.active  { border-color: var(--purple); background: var(--purple-light); }
     .lt-card.active .lt-nm { color: var(--purple); }
     .lt-chk {
@@ -115,24 +149,22 @@
       width: 18px; height: 18px; background: var(--navy);
       border-radius: 50%; display: none;
       align-items: center; justify-content: center;
-      font-size: 9px; color: white; font-weight: 900;
+      font-size: 9px; color: var(--bg); font-weight: 900;
     }
     .lt-card.active .lt-chk { display: flex; }
 
     /* ── Fields ── */
     .fields { padding: 16px 22px 0; }
     .frow { margin-bottom: 20px; }
-    .ftop {
-      display: flex; align-items: center;
-      justify-content: space-between; margin-bottom: 10px;
-    }
-    .flbl { font-size: 14px; font-weight: 700; color: var(--navy); }
+    .ftop { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .flbl { font-size: 14px; font-weight: 700; color: var(--navy); transition: color 0.3s; }
 
     .fbox {
       display: flex; align-items: center;
-      background: var(--white); border: 1.5px solid var(--border);
+      background: var(--card); border: 1.5px solid var(--border);
       border-radius: 12px; padding: 8px 12px; gap: 5px;
       box-shadow: var(--shadow-sm);
+      transition: background 0.3s, border-color 0.3s;
     }
     .fbox .fsym { font-size: 14px; font-weight: 700; color: var(--muted); white-space: nowrap; }
     .fbox input[type="number"] {
@@ -140,53 +172,63 @@
       font-family: 'Nunito', sans-serif;
       font-size: 14px; font-weight: 700; color: var(--navy);
       background: transparent; width: 80px; text-align: right;
-      -moz-appearance: textfield;
+      -moz-appearance: textfield; transition: color 0.3s;
     }
     .fbox input::-webkit-inner-spin-button,
     .fbox input::-webkit-outer-spin-button { display: none; }
 
-    /* Tenure toggle */
     .ten-right { display: flex; align-items: center; gap: 8px; }
-    .unit-toggle {
-      display: flex; background: var(--border);
-      border-radius: 10px; padding: 3px;
-    }
+    .unit-toggle { display: flex; background: var(--tab-bg); border-radius: 10px; padding: 3px; transition: background 0.3s; }
     .ubtn {
       padding: 4px 10px; font-size: 12px; font-weight: 800;
       color: var(--muted); background: transparent;
       border: none; border-radius: 8px; cursor: pointer;
       font-family: 'Nunito', sans-serif; transition: all 0.18s;
     }
-    .ubtn.active { background: var(--white); color: var(--purple); box-shadow: var(--shadow-sm); }
+    .ubtn.active { background: var(--card); color: var(--purple); box-shadow: var(--shadow-sm); }
 
-    /* Slider */
     input[type="range"] {
       -webkit-appearance: none; width: 100%; height: 5px;
       border-radius: 99px; outline: none; cursor: pointer;
     }
     input[type="range"]::-webkit-slider-thumb {
       -webkit-appearance: none; width: 22px; height: 22px;
-      border-radius: 50%; background: var(--white);
+      border-radius: 50%; background: var(--card);
       border: 2.5px solid var(--purple);
       box-shadow: 0 2px 8px rgba(124,92,191,0.28); cursor: pointer;
     }
     input[type="range"]::-moz-range-thumb {
       width: 22px; height: 22px; border-radius: 50%;
-      background: var(--white); border: 2.5px solid var(--purple); cursor: pointer;
+      background: var(--card); border: 2.5px solid var(--purple); cursor: pointer;
     }
+
+    /* Down payment row — hidden for personal */
+    .down-row { transition: opacity 0.2s, max-height 0.3s; overflow: hidden; max-height: 80px; }
+    .down-row.hidden { opacity: 0; max-height: 0; pointer-events: none; margin-bottom: 0 !important; }
 
     /* ── Breakdown ── */
     .breakdown {
       margin: 8px 16px 0;
-      background: var(--white);
-      border-radius: var(--radius);
+      background: var(--card);
+      border-radius: 20px;
       padding: 18px 20px;
       box-shadow: var(--shadow);
+      transition: background 0.3s;
     }
-    .bk-title { font-size: 14px; font-weight: 800; color: var(--navy); margin-bottom: 14px; }
-    .bk-donut-row {
-      display: flex; align-items: center; gap: 20px;
+    .bk-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .bk-title { font-size: 14px; font-weight: 800; color: var(--navy); transition: color 0.3s; }
+
+    /* Yr / Mo toggle in breakdown */
+    .bk-toggle { display: flex; background: var(--tab-bg); border-radius: 10px; padding: 3px; transition: background 0.3s; }
+    .bk-tbtn {
+      padding: 4px 11px; font-size: 12px; font-weight: 800;
+      color: var(--muted); background: transparent;
+      border: none; border-radius: 8px; cursor: pointer;
+      font-family: 'Nunito', sans-serif; transition: all 0.18s;
     }
+    .bk-tbtn.active { background: var(--card); color: var(--purple); box-shadow: var(--shadow-sm); }
+
+    .bk-donut-row { display: flex; align-items: center; gap: 20px; }
     .bk-donut { flex-shrink: 0; position: relative; width: 120px; height: 120px; }
     .bk-donut svg { width: 120px; height: 120px; }
     .bk-center {
@@ -195,72 +237,71 @@
       align-items: center; justify-content: center;
     }
     .bk-c-lbl { font-size: 10px; color: var(--muted); font-weight: 700; }
-    .bk-c-val { font-size: 12px; font-weight: 900; color: var(--navy); }
+    .bk-c-val { font-size: 12px; font-weight: 900; color: var(--navy); transition: color 0.3s; }
 
     .bk-legend { flex: 1; }
-    .bk-leg-item {
-      display: flex; align-items: center;
-      justify-content: space-between;
-      margin-bottom: 10px;
-    }
+    .bk-leg-item { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
     .bk-leg-item:last-child { margin-bottom: 0; }
     .bk-leg-left { display: flex; align-items: center; gap: 8px; }
     .bk-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
     .bk-leg-name { font-size: 12px; color: var(--muted); font-weight: 600; }
-    .bk-leg-val { font-size: 13px; font-weight: 800; color: var(--navy); }
+    .bk-leg-val { font-size: 13px; font-weight: 800; color: var(--navy); transition: color 0.3s; }
 
-    /* ── Year Breakup accordion ── */
-    .yr-accordion {
+    /* ── Schedule accordion ── */
+    .sched-card {
       margin: 10px 16px 0;
-      background: var(--white);
-      border-radius: var(--radius);
+      background: var(--card);
+      border-radius: 20px;
       overflow: hidden;
       box-shadow: var(--shadow);
+      transition: background 0.3s;
     }
-    .yr-hdr {
+    .sched-hdr {
       display: flex; align-items: center; justify-content: space-between;
       padding: 16px 20px; cursor: pointer; user-select: none;
     }
-    .yr-hdr span { font-size: 14px; font-weight: 800; color: var(--navy); }
-    .yr-chev { font-size: 13px; color: var(--muted); transition: transform 0.3s; }
-    .yr-accordion.open .yr-chev { transform: rotate(180deg); }
-    .yr-body { display: none; }
-    .yr-accordion.open .yr-body { display: block; }
+    .sched-title { font-size: 14px; font-weight: 800; color: var(--navy); transition: color 0.3s; }
+    .sched-chev { font-size: 13px; color: var(--muted); transition: transform 0.3s; }
+    .sched-card.open .sched-chev { transform: rotate(180deg); }
+    .sched-body { display: none; }
+    .sched-card.open .sched-body { display: block; }
 
-    .yr-tbl { width: 100%; border-collapse: collapse; }
-    .yr-tbl th {
+    .sched-tbl { width: 100%; border-collapse: collapse; }
+    .sched-tbl th {
       font-size: 11px; font-weight: 700; color: var(--muted);
       text-transform: uppercase; letter-spacing: 0.06em;
       padding: 8px 16px; text-align: right;
-      background: var(--bg); border-top: 1px solid var(--border);
+      background: var(--tbl-alt); border-top: 1px solid var(--border);
+      transition: background 0.3s;
     }
-    .yr-tbl th:first-child { text-align: left; }
-    .yr-tbl td {
+    .sched-tbl th:first-child { text-align: left; }
+    .sched-tbl td {
       font-size: 12px; font-weight: 700; padding: 10px 16px;
       text-align: right; border-top: 1px solid var(--border); color: var(--navy);
+      transition: color 0.3s, border-color 0.3s;
     }
-    .yr-tbl td:first-child { text-align: left; color: var(--muted); font-size: 12px; }
-    .yr-tbl td.cp { color: var(--purple); }
-    .yr-tbl td.ci { color: var(--pink); }
+    .sched-tbl td:first-child { text-align: left; color: var(--muted); }
+    .sched-tbl td.cp { color: var(--purple); }
+    .sched-tbl td.ci { color: var(--pink); }
+    .sched-tbl tr:nth-child(even) td { background: var(--tbl-alt); }
 
-    /* pulse on recalc */
+    /* EMI pulse */
     @keyframes pulse {
-      0%   { opacity: 1; }
-      40%  { opacity: 0.4; }
-      100% { opacity: 1; }
+      0%   { opacity:1; } 40% { opacity:0.35; } 100% { opacity:1; }
     }
-    .recalc { animation: pulse 0.3s ease; }
+    .recalc { animation: pulse 0.28s ease; }
 
+    /* Page entry */
     @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(10px); }
-      to   { opacity: 1; transform: translateY(0); }
+      from { opacity:0; transform:translateY(10px); }
+      to   { opacity:1; transform:translateY(0); }
     }
-    .emi-banner   { animation: fadeUp 0.35s ease both; }
-    .lt-label     { animation: fadeUp 0.35s 0.05s ease both; }
-    .lt-row       { animation: fadeUp 0.35s 0.08s ease both; }
-    .fields       { animation: fadeUp 0.35s 0.11s ease both; }
-    .breakdown    { animation: fadeUp 0.35s 0.16s ease both; }
-    .yr-accordion { animation: fadeUp 0.35s 0.2s ease both; }
+    .emi-banner  { animation: fadeUp 0.35s ease both; }
+    .lt-label    { animation: fadeUp 0.35s 0.05s ease both; }
+    .lt-row      { animation: fadeUp 0.35s 0.08s ease both; }
+    .fields      { animation: fadeUp 0.35s 0.11s ease both; }
+    .breakdown   { animation: fadeUp 0.35s 0.16s ease both; }
+    .sched-card  { animation: fadeUp 0.35s 0.20s ease both; }
   </style>
 </head>
 <body>
@@ -268,45 +309,44 @@
 
   <!-- Top bar -->
   <div class="topbar">
-    <div class="hamburger"><span></span><span></span><span></span></div>
     <div class="currency-pill" onclick="cycleCurrency()">
       <span id="flagEl">🇮🇳</span>
       <span id="currLabel">INR</span>
       <span class="chev">▼</span>
     </div>
+    <div class="theme-toggle" onclick="toggleTheme()" title="Toggle dark/light">
+      <div class="knob" id="knob">☀️</div>
+    </div>
   </div>
 
   <!-- Heading -->
   <div class="heading">
-    <p>Loan EMI</p>
-    <h1>Calculator</h1>
+    <p>Sirat's</p>
+    <h1>EMI Calculator</h1>
   </div>
 
-  <!-- ★ EMI Result Banner (always visible) -->
+  <!-- EMI Banner -->
   <div class="emi-banner">
-    <div class="emi-left">
+    <div>
       <div class="emi-label">EMI per month</div>
       <div class="emi-value" id="emiVal">
-        <span class="esym" id="emiSym">₹</span><span id="emiNum">7,753</span>
+        <span class="esym" id="emiSym">₹</span><span id="emiNum">—</span>
       </div>
     </div>
     <div class="emi-icon" id="emiIcon">🏠</div>
   </div>
 
-  <!-- Loan Type -->
+  <!-- Loan Types -->
   <div class="lt-label">Select loan type</div>
   <div class="lt-row">
-    <div class="lt-card active" onclick="pickLoan(this,'🏠')">
+    <div class="lt-card active" onclick="pickLoan(this,'🏠','home')">
       <span class="lt-ico">🏠</span><div class="lt-nm">Home</div><div class="lt-chk">✓</div>
     </div>
-    <div class="lt-card" onclick="pickLoan(this,'🚗')">
+    <div class="lt-card" onclick="pickLoan(this,'🚗','vehicle')">
       <span class="lt-ico">🚗</span><div class="lt-nm">Vehicle</div><div class="lt-chk">✓</div>
     </div>
-    <div class="lt-card" onclick="pickLoan(this,'💼')">
+    <div class="lt-card" onclick="pickLoan(this,'💼','personal')">
       <span class="lt-ico">💼</span><div class="lt-nm">Personal</div><div class="lt-chk">✓</div>
-    </div>
-    <div class="lt-card" onclick="pickLoan(this,'🎓')">
-      <span class="lt-ico">🎓</span><div class="lt-nm">Education</div><div class="lt-chk">✓</div>
     </div>
   </div>
 
@@ -327,8 +367,8 @@
         oninput="onRng('amt')"/>
     </div>
 
-    <!-- Down Payment -->
-    <div class="frow">
+    <!-- Down Payment (hidden for personal) -->
+    <div class="frow down-row" id="downRow">
       <div class="ftop">
         <label class="flbl">Down Payment</label>
         <div class="fbox">
@@ -376,13 +416,15 @@
 
   </div>
 
-  <!-- Breakdown card with donut -->
+  <!-- Breakdown + Donut -->
   <div class="breakdown">
-    <div class="bk-title">Payment Breakdown</div>
+    <div class="bk-top">
+      <div class="bk-title">Payment Breakdown</div>
+    </div>
     <div class="bk-donut-row">
       <div class="bk-donut">
         <svg viewBox="0 0 120 120">
-          <circle cx="60" cy="60" r="44" fill="none" stroke="#eeeef8" stroke-width="18"/>
+          <circle cx="60" cy="60" r="44" fill="none" stroke="var(--border)" stroke-width="18"/>
           <circle id="dP" cx="60" cy="60" r="44" fill="none" stroke="#7c5cbf" stroke-width="18"
             stroke-dasharray="0 277" transform="rotate(-90 60 60)"
             style="transition:stroke-dasharray 0.5s cubic-bezier(0.4,0,0.2,1)"/>
@@ -400,78 +442,99 @@
       </div>
       <div class="bk-legend">
         <div class="bk-leg-item">
-          <div class="bk-leg-left">
-            <div class="bk-dot" style="background:#7c5cbf"></div>
-            <span class="bk-leg-name">Principal</span>
-          </div>
+          <div class="bk-leg-left"><div class="bk-dot" style="background:#7c5cbf"></div><span class="bk-leg-name">Principal</span></div>
           <span class="bk-leg-val" id="lgP">—</span>
         </div>
         <div class="bk-leg-item">
-          <div class="bk-leg-left">
-            <div class="bk-dot" style="background:#e84db8"></div>
-            <span class="bk-leg-name">Interest</span>
-          </div>
+          <div class="bk-leg-left"><div class="bk-dot" style="background:#e84db8"></div><span class="bk-leg-name">Interest</span></div>
           <span class="bk-leg-val" id="lgI">—</span>
         </div>
         <div class="bk-leg-item">
-          <div class="bk-leg-left">
-            <div class="bk-dot" style="background:#4db8e8"></div>
-            <span class="bk-leg-name">Total Paid</span>
-          </div>
+          <div class="bk-leg-left"><div class="bk-dot" style="background:#4db8e8"></div><span class="bk-leg-name">Total Paid</span></div>
           <span class="bk-leg-val" id="lgT">—</span>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Year Breakup -->
-  <div class="yr-accordion" id="yrAcc">
-    <div class="yr-hdr" onclick="toggleYr()">
-      <span>View Year Breakup</span>
-      <span class="yr-chev">▼</span>
+  <!-- Schedule accordion -->
+  <div class="sched-card" id="schedCard">
+    <div class="sched-hdr" onclick="toggleSched()">
+      <span class="sched-title">View Breakup</span>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="bk-toggle" onclick="event.stopPropagation()">
+          <button class="bk-tbtn active" id="btnYrly" onclick="setSchedView('yearly')">Yearly</button>
+          <button class="bk-tbtn"        id="btnMoly" onclick="setSchedView('monthly')">Monthly</button>
+        </div>
+        <span class="sched-chev">▼</span>
+      </div>
     </div>
-    <div class="yr-body">
-      <table class="yr-tbl">
-        <thead>
-          <tr><th>Year</th><th>Principal</th><th>Interest</th><th>Balance</th></tr>
-        </thead>
-        <tbody id="yrBody"></tbody>
+    <div class="sched-body">
+      <table class="sched-tbl">
+        <thead id="schedHead"></thead>
+        <tbody id="schedBody"></tbody>
       </table>
     </div>
   </div>
 
-</div><!-- /app -->
+</div>
 
 <script>
+  // ── State ──
   const CURRENCIES = [
-    {flag:'🇮🇳', label:'INR', sym:'₹'},
-    {flag:'🇺🇸', label:'USD', sym:'$'},
-    {flag:'🇬🇧', label:'GBP', sym:'£'},
-    {flag:'🇪🇺', label:'EUR', sym:'€'},
+    {flag:'🇮🇳',label:'INR',sym:'₹'},
+    {flag:'🇺🇸',label:'USD',sym:'$'},
+    {flag:'🇬🇧',label:'GBP',sym:'£'},
+    {flag:'🇪🇺',label:'EUR',sym:'€'},
   ];
-  let curIdx = 0;
+  let curIdx   = 0;
   let loanIcon = '🏠';
-  let tenUnit = 'months';
+  let loanType = 'home';   // 'home' | 'vehicle' | 'personal'
+  let tenUnit  = 'months';
+  let schedView= 'yearly'; // 'yearly' | 'monthly'
+  let isDark   = false;
 
   const sym = () => CURRENCIES[curIdx].sym;
 
+  // ── Theme ──
+  function toggleTheme() {
+    isDark = !isDark;
+    document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+    document.getElementById('knob').textContent = isDark ? '🌙' : '☀️';
+    document.getElementById('themeColor').content = isDark ? '#0e0f1a' : '#eef0fb';
+    // re-apply range gradients (colours change)
+    ['amt','down','ten','rate'].forEach(f => grad(f));
+  }
+
+  // ── Currency ──
   function cycleCurrency() {
     curIdx = (curIdx + 1) % CURRENCIES.length;
-    document.getElementById('flagEl').textContent = CURRENCIES[curIdx].flag;
-    document.getElementById('currLabel').textContent = CURRENCIES[curIdx].label;
-    document.getElementById('sym1').textContent = sym();
-    document.getElementById('sym2').textContent = sym();
-    document.getElementById('emiSym').textContent = sym();
+    document.getElementById('flagEl').textContent   = CURRENCIES[curIdx].flag;
+    document.getElementById('currLabel').textContent= CURRENCIES[curIdx].label;
+    document.getElementById('sym1').textContent     = sym();
+    document.getElementById('sym2').textContent     = sym();
+    document.getElementById('emiSym').textContent   = sym();
     recalc();
   }
 
-  function pickLoan(el, icon) {
+  // ── Loan type ──
+  function pickLoan(el, icon, type) {
     document.querySelectorAll('.lt-card').forEach(c => c.classList.remove('active'));
     el.classList.add('active');
     loanIcon = icon;
+    loanType = type;
     document.getElementById('emiIcon').textContent = icon;
+    // Show/hide down payment
+    const dr = document.getElementById('downRow');
+    if (type === 'personal') {
+      dr.classList.add('hidden');
+    } else {
+      dr.classList.remove('hidden');
+    }
+    recalc();
   }
 
+  // ── Tenure unit ──
   function setUnit(u) {
     tenUnit = u;
     const inp = document.getElementById('tenIn');
@@ -495,7 +558,15 @@
     grad('ten'); recalc();
   }
 
-  // Slider ↔ input sync
+  // ── Schedule view ──
+  function setSchedView(v) {
+    schedView = v;
+    document.getElementById('btnYrly').classList.toggle('active', v === 'yearly');
+    document.getElementById('btnMoly').classList.toggle('active', v === 'monthly');
+    recalc();
+  }
+
+  // ── Slider ↔ input ──
   function onRng(f) {
     document.getElementById(f+'In').value = document.getElementById(f+'Rng').value;
     grad(f); recalc();
@@ -503,11 +574,8 @@
   function onIn(f) {
     const inp = document.getElementById(f+'In');
     const rng = document.getElementById(f+'Rng');
-    const v = parseFloat(inp.value);
-    if (!isNaN(v)) {
-      const clamped = Math.min(Math.max(v, parseFloat(rng.min)), parseFloat(rng.max));
-      rng.value = clamped;
-    }
+    const v   = parseFloat(inp.value);
+    if (!isNaN(v)) rng.value = Math.min(Math.max(v, parseFloat(rng.min)), parseFloat(rng.max));
     grad(f); recalc();
   }
   function clamp(f) {
@@ -520,102 +588,121 @@
     grad(f); recalc();
   }
   function grad(f) {
-    const el = document.getElementById(f+'Rng');
+    const el  = document.getElementById(f+'Rng');
     const pct = ((el.value - el.min) / (el.max - el.min)) * 100;
-    el.style.background = `linear-gradient(to right,#7c5cbf 0%,#7c5cbf ${pct}%,#e2e4f3 ${pct}%,#e2e4f3 100%)`;
+    const track = isDark ? '#2a2e4a' : '#e2e4f3';
+    el.style.background = `linear-gradient(to right,#7c5cbf 0%,#7c5cbf ${pct}%,${track} ${pct}%,${track} 100%)`;
   }
 
-  // EMI formula
+  // ── Maths ──
   function calcEMI(P, annRate, months) {
     const r = annRate / 12 / 100;
-    if (r === 0) return P / months;
+    if (r === 0) return months ? P / months : 0;
     return P * r * Math.pow(1+r, months) / (Math.pow(1+r, months) - 1);
   }
   function fmt(n)  { return new Intl.NumberFormat('en-IN',{maximumFractionDigits:0}).format(Math.round(n)); }
   function fmtS(n) {
-    if (n>=10000000) return (n/10000000).toFixed(1)+'Cr';
-    if (n>=100000)   return (n/100000).toFixed(1)+'L';
-    if (n>=1000)     return (n/1000).toFixed(1)+'K';
+    if (n >= 10000000) return (n/10000000).toFixed(1)+'Cr';
+    if (n >= 100000)   return (n/100000).toFixed(1)+'L';
+    if (n >= 1000)     return (n/1000).toFixed(1)+'K';
     return Math.round(n).toString();
   }
 
+  // ── Main recalc ──
   function recalc() {
     const loanAmt = parseFloat(document.getElementById('amtIn').value)  || 0;
-    const downAmt = parseFloat(document.getElementById('downIn').value) || 0;
+    const downAmt = loanType === 'personal' ? 0 : (parseFloat(document.getElementById('downIn').value) || 0);
     const tenRaw  = parseFloat(document.getElementById('tenIn').value)  || 1;
     const rate    = parseFloat(document.getElementById('rateIn').value) || 0;
 
-    const months  = tenUnit === 'months' ? tenRaw : tenRaw * 12;
-    const P       = Math.max(loanAmt - downAmt, 0);
-    const monthly = calcEMI(P, rate, months);
+    const months    = tenUnit === 'months' ? tenRaw : tenRaw * 12;
+    const P         = Math.max(loanAmt - downAmt, 0);
+    const monthly   = calcEMI(P, rate, months);
     const totalPaid = monthly * months;
     const interest  = totalPaid - P;
     const grand     = totalPaid + downAmt;
-    const s = sym();
+    const s         = sym();
 
     // EMI banner
-    const emiEl = document.getElementById('emiNum');
-    emiEl.textContent = fmt(monthly);
-    emiEl.classList.remove('recalc');
-    void emiEl.offsetWidth;
-    emiEl.classList.add('recalc');
+    const numEl = document.getElementById('emiNum');
+    numEl.textContent = fmt(monthly);
+    numEl.classList.remove('recalc');
+    void numEl.offsetWidth;
+    numEl.classList.add('recalc');
 
-    // Donut (r=44, circ≈276.5)
-    const C = 2 * Math.PI * 44;
-    const total = P + interest + downAmt;
-    const safeTotal = total || 1;
-    const pSlice = (P / safeTotal) * C;
-    const iSlice = (interest / safeTotal) * C;
-    const dSlice = (downAmt / safeTotal) * C;
+    // Donut (r=44, C≈276.46)
+    const C         = 2 * Math.PI * 44;
+    const safeGrand = grand || 1;
+    const pSlice    = (P         / safeGrand) * C;
+    const iSlice    = (interest  / safeGrand) * C;
+    const dSlice    = (downAmt   / safeGrand) * C;
 
     const dp = document.getElementById('dP');
     const di = document.getElementById('dI');
     const dd = document.getElementById('dD');
-    dp.setAttribute('stroke-dasharray', `${pSlice} ${C - pSlice}`);
+    dp.setAttribute('stroke-dasharray', `${pSlice} ${C-pSlice}`);
     dp.style.strokeDashoffset = 0;
-    di.setAttribute('stroke-dasharray', `${iSlice} ${C - iSlice}`);
+    di.setAttribute('stroke-dasharray', `${iSlice} ${C-iSlice}`);
     di.style.strokeDashoffset = -pSlice;
-    dd.setAttribute('stroke-dasharray', `${dSlice} ${C - dSlice}`);
+    dd.setAttribute('stroke-dasharray', `${dSlice} ${C-dSlice}`);
     dd.style.strokeDashoffset = -(pSlice + iSlice);
 
     document.getElementById('dCenter').textContent = s + fmtS(grand);
-    document.getElementById('lgP').textContent = s + fmt(P);
-    document.getElementById('lgI').textContent = s + fmt(interest);
-    document.getElementById('lgT').textContent = s + fmt(grand);
+    document.getElementById('lgP').textContent     = s + fmt(P);
+    document.getElementById('lgI').textContent     = s + fmt(interest);
+    document.getElementById('lgT').textContent     = s + fmt(grand);
 
-    // Year table
-    buildTable(P, rate, months, monthly);
+    // Schedule table
+    buildSched(P, rate, months, monthly);
   }
 
-  function buildTable(P, annRate, totalMonths, monthly) {
-    const r = annRate / 12 / 100;
-    let bal = P;
-    const tbody = document.getElementById('yrBody');
-    tbody.innerHTML = '';
-    const years = Math.ceil(totalMonths / 12);
-    const s = sym();
-    for (let y = 1; y <= years; y++) {
-      let yP = 0, yI = 0;
-      const mo = Math.min(12, totalMonths - (y-1)*12);
-      for (let m = 0; m < mo; m++) {
-        if (bal <= 0) break;
-        const iAmt = bal * r;
-        const pAmt = Math.min(monthly - iAmt, bal);
-        yI += iAmt; yP += pAmt; bal -= pAmt;
+  // ── Schedule table ──
+  function buildSched(P, annRate, totalMonths, monthly) {
+    const r     = annRate / 12 / 100;
+    const s     = sym();
+    const head  = document.getElementById('schedHead');
+    const tbody = document.getElementById('schedBody');
+
+    if (schedView === 'yearly') {
+      head.innerHTML = `<tr><th>Year</th><th>Principal</th><th>Interest</th><th>Balance</th></tr>`;
+      tbody.innerHTML = '';
+      let bal   = P;
+      const yrs = Math.ceil(totalMonths / 12);
+      for (let y = 1; y <= yrs; y++) {
+        let yP = 0, yI = 0;
+        const mo = Math.min(12, totalMonths - (y-1)*12);
+        for (let m = 0; m < mo; m++) {
+          if (bal <= 0) break;
+          const iA = bal * r; const pA = Math.min(monthly - iA, bal);
+          yI += iA; yP += pA; bal -= pA;
+        }
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>Yr ${y}</td><td class="cp">${s}${fmt(yP)}</td><td class="ci">${s}${fmt(yI)}</td><td>${s}${fmt(Math.max(bal,0))}</td>`;
+        tbody.appendChild(tr);
       }
-      const tr = document.createElement('tr');
-      tr.innerHTML = `<td>Yr ${y}</td><td class="cp">${s}${fmt(yP)}</td><td class="ci">${s}${fmt(yI)}</td><td>${s}${fmt(Math.max(bal,0))}</td>`;
-      tbody.appendChild(tr);
+    } else {
+      head.innerHTML = `<tr><th>Month</th><th>Principal</th><th>Interest</th><th>Balance</th></tr>`;
+      tbody.innerHTML = '';
+      let bal = P;
+      for (let m = 1; m <= totalMonths; m++) {
+        if (bal <= 0) break;
+        const iA = bal * r;
+        const pA = Math.min(monthly - iA, bal);
+        bal -= pA;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>Mo ${m}</td><td class="cp">${s}${fmt(pA)}</td><td class="ci">${s}${fmt(iA)}</td><td>${s}${fmt(Math.max(bal,0))}</td>`;
+        tbody.appendChild(tr);
+      }
     }
   }
 
-  function toggleYr() {
-    document.getElementById('yrAcc').classList.toggle('open');
+  function toggleSched() {
+    document.getElementById('schedCard').classList.toggle('open');
   }
 
-  // Boot
-  document.getElementById('sym1').textContent = sym();
-  document.getElementById('sym2').textContent = sym();
+  // ── Boot ──
+  document.getElementById('sym1').textContent   = sym();
+  document.getElementById('sym2').textContent   = sym();
   document.getElementById('emiSym').textContent = sym();
   ['amt','down','ten','rate'].forEach(f => grad(f));
   recalc();
