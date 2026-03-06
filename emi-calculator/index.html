@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="EMI Calc" />
+  <meta name="theme-color" content="#0f1117" />
+  <meta name="description" content="EMI Calculator — Loan repayment planner" />
+  <title>EMI Calculator</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0c12;
+      --surface: #13161f;
+      --card: #181c28;
+      --border: rgba(255,255,255,0.07);
+      --accent: #6ee7b7;
+      --accent2: #38bdf8;
+      --accent3: #f472b6;
+      --text: #f0f4ff;
+      --muted: #6b7280;
+      --radius: 20px;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* Ambient background glow */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -200px; left: -200px;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(110,231,183,0.08) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    body::after {
+      content: '';
+      position: fixed;
+      bottom: -150px; right: -150px;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(56,189,248,0.07) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .app {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      max-width: 480px;
+      margin: 0 auto;
+      padding: env(safe-area-inset-top, 0) 0 env(safe-area-inset-bottom, 0);
+    }
+
+    /* ── Header ── */
+    header {
+      padding: 52px 24px 20px;
+    }
+    .header-label {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+    header h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: 30px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+    }
+    header p {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    /* ── Loan Type Tabs ── */
+    .tabs {
+      display: flex;
+      gap: 8px;
+      padding: 0 24px 20px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tab {
+      flex-shrink: 0;
+      padding: 7px 16px;
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 500;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tab.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #0a0c12;
+    }
+
+    /* ── Main Card ── */
+    .card {
+      margin: 0 16px 16px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      backdrop-filter: blur(20px);
+    }
+
+    /* ── Inputs ── */
+    .field { margin-bottom: 24px; }
+    .field:last-child { margin-bottom: 0; }
+
+    .field-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .field-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      letter-spacing: 0.01em;
+    }
+    .field-value {
+      font-family: 'Syne', sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .field-unit {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--muted);
+      margin-left: 3px;
+    }
+
+    .number-input-row {
+      display: flex;
+      align-items: center;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 14px;
+      margin-bottom: 10px;
+      gap: 8px;
+    }
+    .currency-badge {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--accent);
+      min-width: 18px;
+    }
+    .number-input-row input[type="number"] {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-family: 'Syne', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      -moz-appearance: textfield;
+    }
+    .number-input-row input[type="number"]::-webkit-inner-spin-button,
+    .number-input-row input[type="number"]::-webkit-outer-spin-button { display: none; }
+    .step-btns { display: flex; gap: 4px; }
+    .step-btn {
+      width: 28px; height: 28px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      font-size: 16px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s, border-color 0.15s;
+      line-height: 1;
+      padding-bottom: 1px;
+    }
+    .step-btn:active { background: var(--accent); border-color: var(--accent); color: #0a0c12; }
+
+    /* Range Slider */
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 4px;
+      border-radius: 99px;
+      outline: none;
+      cursor: pointer;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 3px rgba(110,231,183,0.25);
+      cursor: pointer;
+      transition: box-shadow 0.2s;
+    }
+    input[type="range"]::-webkit-slider-thumb:active {
+      box-shadow: 0 0 0 6px rgba(110,231,183,0.3);
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+      border: none;
+    }
+
+    .range-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 6px;
+    }
+    .range-labels span {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    /* ── Result Card ── */
+    .result-card {
+      margin: 0 16px 16px;
+      background: linear-gradient(135deg, rgba(110,231,183,0.12), rgba(56,189,248,0.08));
+      border: 1px solid rgba(110,231,183,0.2);
+      border-radius: var(--radius);
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .result-card::before {
+      content: '';
+      position: absolute;
+      top: -40px; right: -40px;
+      width: 150px; height: 150px;
+      background: radial-gradient(circle, rgba(110,231,183,0.15), transparent 70%);
+    }
+    .result-label {
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+    .result-emi {
+      font-family: 'Syne', sans-serif;
+      font-size: 42px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.03em;
+      line-height: 1;
+    }
+    .result-emi .currency-sym { font-size: 26px; vertical-align: super; margin-right: 2px; opacity: 0.6; }
+    .result-sub {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* ── Breakdown Row ── */
+    .breakdown {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+      margin: 0 16px 16px;
+    }
+    .breakdown-item {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px 12px;
+    }
+    .breakdown-item .bi-label {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 5px;
+      letter-spacing: 0.03em;
+    }
+    .breakdown-item .bi-val {
+      font-family: 'Syne', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .breakdown-item .bi-val.green { color: var(--accent); }
+    .breakdown-item .bi-val.blue { color: var(--accent2); }
+    .breakdown-item .bi-val.pink { color: var(--accent3); }
+
+    /* ── Donut Chart ── */
+    .chart-card {
+      margin: 0 16px 16px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+    }
+    .chart-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: var(--text);
+    }
+    .donut-wrap {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+    .donut-svg { flex-shrink: 0; }
+    .donut-legend { flex: 1; }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .legend-dot {
+      width: 10px; height: 10px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+    .legend-info { flex: 1; }
+    .legend-name { font-size: 12px; color: var(--muted); }
+    .legend-amount {
+      font-family: 'Syne', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .legend-pct {
+      font-size: 11px;
+      color: var(--muted);
+      margin-left: 4px;
+    }
+
+    /* ── Amortization Table ── */
+    .table-card {
+      margin: 0 16px 24px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .table-header {
+      padding: 18px 20px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+    .table-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .toggle-table {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 12px;
+      padding: 5px 12px;
+      border-radius: 100px;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: all 0.2s;
+    }
+    .toggle-table:hover { border-color: var(--accent); color: var(--accent); }
+
+    .amortization-table { width: 100%; border-collapse: collapse; }
+    .amortization-table th {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 10px 20px;
+      text-align: right;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255,255,255,0.02);
+    }
+    .amortization-table th:first-child { text-align: left; }
+    .amortization-table td {
+      font-size: 13px;
+      padding: 11px 20px;
+      text-align: right;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      color: var(--text);
+    }
+    .amortization-table td:first-child { text-align: left; color: var(--muted); }
+    .amortization-table tr:last-child td { border-bottom: none; }
+    .amortization-table tr:hover td { background: rgba(255,255,255,0.02); }
+    .td-interest { color: var(--accent3) !important; }
+    .td-principal { color: var(--accent2) !important; }
+
+    /* ── Animations ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .card, .result-card, .breakdown, .chart-card, .table-card {
+      animation: fadeUp 0.4s ease both;
+    }
+    .result-card { animation-delay: 0.05s; }
+    .breakdown { animation-delay: 0.1s; }
+    .chart-card { animation-delay: 0.15s; }
+    .table-card { animation-delay: 0.2s; }
+
+    /* ── Utility ── */
+    .hidden { display: none !important; }
+    .section-spacer { height: 8px; }
+
+    @media (max-width: 360px) {
+      .result-emi { font-size: 36px; }
+      .breakdown { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app">
+
+  <header>
+    <div class="header-label">Finance Tool</div>
+    <h1>EMI Calculator</h1>
+    <p>Plan your loan repayments easily</p>
+  </header>
+
+  <!-- Loan Type Tabs -->
+  <div class="tabs">
+    <button class="tab active" onclick="setType(this,'Home Loan')">🏠 Home Loan</button>
+    <button class="tab" onclick="setType(this,'Car Loan')">🚗 Car Loan</button>
+    <button class="tab" onclick="setType(this,'Personal Loan')">💼 Personal</button>
+    <button class="tab" onclick="setType(this,'Education')">🎓 Education</button>
+  </div>
+
+  <!-- Input Card -->
+  <div class="card">
+
+    <!-- Loan Amount -->
+    <div class="field">
+      <div class="field-header">
+        <span class="field-label">Loan Amount</span>
+        <span class="field-value" id="amountDisplay">₹10,00,000<span class="field-unit"></span></span>
+      </div>
+      <div class="number-input-row">
+        <span class="currency-badge">₹</span>
+        <input type="number" id="amountInput" value="1000000" min="10000" max="100000000" step="10000"
+          oninput="syncFromInput('amount')" />
+        <div class="step-btns">
+          <button class="step-btn" onclick="step('amount',-1)">−</button>
+          <button class="step-btn" onclick="step('amount',1)">+</button>
+        </div>
+      </div>
+      <input type="range" id="amountRange" min="10000" max="10000000" step="10000" value="1000000"
+        oninput="syncFromRange('amount')" />
+      <div class="range-labels"><span>₹10K</span><span>₹1Cr</span></div>
+    </div>
+
+    <!-- Interest Rate -->
+    <div class="field">
+      <div class="field-header">
+        <span class="field-label">Interest Rate</span>
+        <span class="field-value" id="rateDisplay">8.5<span class="field-unit">% p.a.</span></span>
+      </div>
+      <div class="number-input-row">
+        <span class="currency-badge">%</span>
+        <input type="number" id="rateInput" value="8.5" min="1" max="30" step="0.1"
+          oninput="syncFromInput('rate')" />
+        <div class="step-btns">
+          <button class="step-btn" onclick="step('rate',-1)">−</button>
+          <button class="step-btn" onclick="step('rate',1)">+</button>
+        </div>
+      </div>
+      <input type="range" id="rateRange" min="1" max="30" step="0.1" value="8.5"
+        oninput="syncFromRange('rate')" />
+      <div class="range-labels"><span>1%</span><span>30%</span></div>
+    </div>
+
+    <!-- Tenure -->
+    <div class="field">
+      <div class="field-header">
+        <span class="field-label">Loan Tenure</span>
+        <span class="field-value" id="tenureDisplay">20<span class="field-unit"> Yr</span></span>
+      </div>
+      <div class="number-input-row">
+        <span class="currency-badge">Yr</span>
+        <input type="number" id="tenureInput" value="20" min="1" max="30" step="1"
+          oninput="syncFromInput('tenure')" />
+        <div class="step-btns">
+          <button class="step-btn" onclick="step('tenure',-1)">−</button>
+          <button class="step-btn" onclick="step('tenure',1)">+</button>
+        </div>
+      </div>
+      <input type="range" id="tenureRange" min="1" max="30" step="1" value="20"
+        oninput="syncFromRange('tenure')" />
+      <div class="range-labels"><span>1 Yr</span><span>30 Yr</span></div>
+    </div>
+
+  </div>
+
+  <!-- Result Card -->
+  <div class="result-card">
+    <div class="result-label">Monthly EMI</div>
+    <div class="result-emi"><span class="currency-sym">₹</span><span id="emiValue">8,678</span></div>
+    <div class="result-sub" id="emiSubtitle">For 240 months · Starts next month</div>
+  </div>
+
+  <!-- Breakdown -->
+  <div class="breakdown">
+    <div class="breakdown-item">
+      <div class="bi-label">Principal</div>
+      <div class="bi-val green" id="principalVal">₹10L</div>
+    </div>
+    <div class="breakdown-item">
+      <div class="bi-label">Interest</div>
+      <div class="bi-val pink" id="interestVal">₹10.8L</div>
+    </div>
+    <div class="breakdown-item">
+      <div class="bi-label">Total</div>
+      <div class="bi-val blue" id="totalVal">₹20.8L</div>
+    </div>
+  </div>
+
+  <!-- Donut Chart -->
+  <div class="chart-card">
+    <div class="chart-title">Payment Breakdown</div>
+    <div class="donut-wrap">
+      <svg class="donut-svg" width="120" height="120" viewBox="0 0 120 120" id="donutSvg">
+        <circle cx="60" cy="60" r="46" fill="none" stroke="#1e2234" stroke-width="18"/>
+        <circle id="donutInterest" cx="60" cy="60" r="46" fill="none" stroke="#f472b6" stroke-width="18"
+          stroke-linecap="round" stroke-dasharray="0 289" transform="rotate(-90 60 60)" style="transition:stroke-dasharray 0.6s ease"/>
+        <circle id="donutPrincipal" cx="60" cy="60" r="46" fill="none" stroke="#38bdf8" stroke-width="18"
+          stroke-linecap="round" stroke-dasharray="0 289" transform="rotate(-90 60 60)" style="transition:stroke-dasharray 0.6s ease"/>
+      </svg>
+      <div class="donut-legend">
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#38bdf8"></div>
+          <div class="legend-info">
+            <div class="legend-name">Principal Amount</div>
+            <div class="legend-amount" id="legendPrincipal">₹10,00,000<span class="legend-pct" id="pctPrincipal">(48%)</span></div>
+          </div>
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#f472b6"></div>
+          <div class="legend-info">
+            <div class="legend-name">Total Interest</div>
+            <div class="legend-amount" id="legendInterest">₹10,82,720<span class="legend-pct" id="pctInterest">(52%)</span></div>
+          </div>
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#6ee7b7"></div>
+          <div class="legend-info">
+            <div class="legend-name">Total Payable</div>
+            <div class="legend-amount" id="legendTotal">₹20,82,720</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Amortization Table -->
+  <div class="table-card">
+    <div class="table-header">
+      <div class="table-title">Year-wise Schedule</div>
+      <button class="toggle-table" id="toggleBtn" onclick="toggleTable()">Show</button>
+    </div>
+    <div id="tableWrap" class="hidden">
+      <table class="amortization-table">
+        <thead>
+          <tr>
+            <th>Year</th>
+            <th>Principal</th>
+            <th>Interest</th>
+            <th>Balance</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // ── State ──
+  const state = {
+    amount: 1000000,
+    rate: 8.5,
+    tenure: 20,
+    type: 'Home Loan'
+  };
+
+  // ── Sync helpers ──
+  function syncFromRange(field) {
+    const val = parseFloat(document.getElementById(field + 'Range').value);
+    state[field] = val;
+    document.getElementById(field + 'Input').value = val;
+    calculate();
+  }
+  function syncFromInput(field) {
+    const el = document.getElementById(field + 'Input');
+    let val = parseFloat(el.value);
+    const rangeEl = document.getElementById(field + 'Range');
+    if (isNaN(val)) return;
+    val = Math.min(Math.max(val, parseFloat(rangeEl.min)), parseFloat(rangeEl.max));
+    state[field] = val;
+    rangeEl.value = val;
+    calculate();
+  }
+  function step(field, dir) {
+    const el = document.getElementById(field + 'Input');
+    const step = parseFloat(el.step) || 1;
+    el.value = parseFloat(el.value) + dir * step;
+    syncFromInput(field);
+  }
+  function setType(el, type) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    state.type = type;
+  }
+
+  // ── Core EMI Calculation ──
+  function calcEMI(P, annualRate, years) {
+    const r = annualRate / 12 / 100;
+    const n = years * 12;
+    if (r === 0) return P / n;
+    return P * r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1);
+  }
+
+  function fmtINR(n) {
+    return new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(Math.round(n));
+  }
+  function fmtShort(n) {
+    if (n >= 10000000) return '₹' + (n / 10000000).toFixed(1) + 'Cr';
+    if (n >= 100000) return '₹' + (n / 100000).toFixed(1) + 'L';
+    if (n >= 1000) return '₹' + (n / 1000).toFixed(1) + 'K';
+    return '₹' + Math.round(n);
+  }
+
+  // Gradient on range
+  function updateRangeGradient(field) {
+    const el = document.getElementById(field + 'Range');
+    const min = parseFloat(el.min), max = parseFloat(el.max), val = parseFloat(el.value);
+    const pct = ((val - min) / (max - min)) * 100;
+    el.style.background = `linear-gradient(to right, #6ee7b7 0%, #6ee7b7 ${pct}%, #1e2234 ${pct}%, #1e2234 100%)`;
+  }
+
+  function calculate() {
+    const { amount, rate, tenure } = state;
+    const emi = calcEMI(amount, rate, tenure);
+    const totalPayment = emi * tenure * 12;
+    const totalInterest = totalPayment - amount;
+    const months = tenure * 12;
+    const pctPrincipal = Math.round((amount / totalPayment) * 100);
+    const pctInterest = 100 - pctPrincipal;
+
+    // Update EMI display
+    document.getElementById('emiValue').textContent = fmtINR(emi);
+    document.getElementById('emiSubtitle').textContent = `For ${months} months · Starts next month`;
+
+    // Breakdown
+    document.getElementById('principalVal').textContent = fmtShort(amount);
+    document.getElementById('interestVal').textContent = fmtShort(totalInterest);
+    document.getElementById('totalVal').textContent = fmtShort(totalPayment);
+
+    // Amount display
+    document.getElementById('amountDisplay').innerHTML = fmtShort(amount);
+    document.getElementById('rateDisplay').innerHTML = `${rate}<span class="field-unit">% p.a.</span>`;
+    document.getElementById('tenureDisplay').innerHTML = `${tenure}<span class="field-unit"> Yr</span>`;
+
+    // Legend
+    document.getElementById('legendPrincipal').innerHTML = `₹${fmtINR(amount)}<span class="legend-pct">(${pctPrincipal}%)</span>`;
+    document.getElementById('legendInterest').innerHTML = `₹${fmtINR(totalInterest)}<span class="legend-pct">(${pctInterest}%)</span>`;
+    document.getElementById('legendTotal').innerHTML = `₹${fmtINR(totalPayment)}`;
+
+    // Donut chart (circumference = 2πr = 2*π*46 ≈ 289)
+    const circ = 2 * Math.PI * 46;
+    const pSlice = (pctPrincipal / 100) * circ;
+    const iSlice = (pctInterest / 100) * circ;
+    // Principal arc first, then interest offset
+    const pEl = document.getElementById('donutPrincipal');
+    const iEl = document.getElementById('donutInterest');
+    pEl.setAttribute('stroke-dasharray', `${pSlice} ${circ - pSlice}`);
+    pEl.setAttribute('stroke-dashoffset', '0');
+    iEl.setAttribute('stroke-dasharray', `${iSlice} ${circ - iSlice}`);
+    iEl.setAttribute('stroke-dashoffset', `${-pSlice}`);
+
+    // Range gradients
+    updateRangeGradient('amount');
+    updateRangeGradient('rate');
+    updateRangeGradient('tenure');
+
+    // Amortization table
+    buildAmortTable(amount, rate, tenure, emi);
+  }
+
+  function buildAmortTable(P, annualRate, years, emi) {
+    const r = annualRate / 12 / 100;
+    let balance = P;
+    const tbody = document.getElementById('tableBody');
+    tbody.innerHTML = '';
+    for (let y = 1; y <= years; y++) {
+      let yearPrincipal = 0, yearInterest = 0;
+      for (let m = 0; m < 12; m++) {
+        if (balance <= 0) break;
+        const interest = balance * r;
+        const principal = Math.min(emi - interest, balance);
+        yearInterest += interest;
+        yearPrincipal += principal;
+        balance -= principal;
+      }
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>Yr ${y}</td>
+        <td class="td-principal">₹${fmtINR(yearPrincipal)}</td>
+        <td class="td-interest">₹${fmtINR(yearInterest)}</td>
+        <td>₹${fmtINR(Math.max(balance, 0))}</td>
+      `;
+      tbody.appendChild(tr);
+    }
+  }
+
+  let tableVisible = false;
+  function toggleTable() {
+    tableVisible = !tableVisible;
+    document.getElementById('tableWrap').classList.toggle('hidden', !tableVisible);
+    document.getElementById('toggleBtn').textContent = tableVisible ? 'Hide' : 'Show';
+  }
+
+  // ── Init ──
+  calculate();
+
+  // ── Service Worker (offline PWA) ──
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js').catch(() => {});
+    });
+  }
+</script>
+
+</body>
+</html>
