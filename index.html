@@ -1,307 +1,773 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>@idiotproof — Clint Ratnam</title>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-<style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-[data-theme="dark"]{--bg:#0a0c10;--sur:#111318;--sur2:#161a22;--bdr:#1e2530;--txt:#e2eaf4;--mut:#5a7080;--acc:#0066ff;--accl:rgba(0,102,255,.12);--accg:rgba(0,102,255,.07);--grid:rgba(255,255,255,.05);--hbg:rgba(10,12,16,.88);--chov:#13171f}
-[data-theme="light"]{--bg:#fafafa;--sur:#fff;--sur2:#f4f6f9;--bdr:#e4e8ee;--txt:#0a0c10;--mut:#8a9aaa;--acc:#0055ee;--accl:rgba(0,85,238,.08);--accg:rgba(0,85,238,.04);--grid:rgba(0,0,0,.05);--hbg:rgba(250,250,250,.88);--chov:#f7f9fc}
-html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--txt);font-family:'Manrope',sans-serif;font-weight:400;overflow-x:hidden;transition:background .3s,color .3s}
-.grid-bg{position:fixed;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:48px 48px;-webkit-mask-image:radial-gradient(ellipse 100% 100% at 50% 0%,black 30%,transparent 80%);mask-image:radial-gradient(ellipse 100% 100% at 50% 0%,black 30%,transparent 80%)}
-.mglow{position:fixed;width:700px;height:700px;border-radius:50%;background:radial-gradient(circle,var(--accg) 0%,transparent 65%);pointer-events:none;z-index:0;transform:translate(-50%,-50%)}
-header{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:1.1rem 3rem;border-bottom:1px solid var(--bdr);background:var(--hbg);backdrop-filter:blur(16px)}
-.logo{font-weight:800;font-size:1rem;text-decoration:none;color:var(--txt);letter-spacing:-.03em}
-.logo .at{color:var(--acc)}
-nav{display:flex;gap:.25rem;align-items:center}
-nav a{font-size:.8rem;font-weight:500;color:var(--mut);text-decoration:none;padding:.4rem .9rem;border-radius:100px;transition:all .15s}
-nav a:hover{background:var(--sur2);color:var(--txt)}
-.tbtn{width:36px;height:36px;border-radius:100px;border:1px solid var(--bdr);background:var(--sur2);cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;margin-left:.5rem;transition:border-color .2s}
-.tbtn:hover{border-color:var(--acc)}
-.page{position:relative;z-index:1}
-.hero{min-height:100vh;display:flex;align-items:center;padding:8rem 3rem 5rem;max-width:1100px;margin:0 auto}
-.tag-row{display:flex;gap:.6rem;margin-bottom:2.5rem;flex-wrap:wrap}
-.tag{font-size:.72rem;font-weight:600;padding:.3rem .9rem;border-radius:100px;border:1px solid var(--bdr);background:var(--sur2);color:var(--mut)}
-.tag-b{background:var(--accl);border-color:rgba(0,102,255,.25);color:var(--acc)}
-.ldot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#22c55e;margin-right:.3rem;animation:pulse 2s infinite;vertical-align:middle}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-h1{font-size:clamp(2.8rem,6.5vw,5.5rem);font-weight:800;line-height:1;letter-spacing:-.04em;margin-bottom:1rem}
-.n1{display:block;color:var(--txt)}
-.n2{display:block;color:var(--acc)}
-.n3{display:block;color:var(--mut);font-weight:300}
-.hdesc{font-size:1rem;color:var(--mut);line-height:1.8;max-width:560px;margin:1.75rem 0 2.5rem}
-.hdesc strong{color:var(--txt);font-weight:600}
-.cta{display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:3rem}
-.btn{display:inline-flex;align-items:center;gap:.4rem;padding:.75rem 1.5rem;border-radius:100px;font-size:.82rem;font-weight:600;text-decoration:none;font-family:'Manrope',sans-serif;transition:all .18s;cursor:pointer;border:none}
-.bp{background:var(--acc);color:#fff}
-.bp:hover{filter:brightness(1.15);transform:translateY(-1px)}
-.bg2{background:var(--sur2);border:1px solid var(--bdr);color:var(--mut)}
-.bg2:hover{border-color:var(--acc);color:var(--acc)}
-.chips{display:flex;flex-wrap:wrap;gap:.5rem}
-.chip{font-size:.72rem;font-weight:500;padding:.35rem .9rem;border-radius:100px;background:var(--sur2);border:1px solid var(--bdr);color:var(--mut)}
-.mwrap{border-top:1px solid var(--bdr);border-bottom:1px solid var(--bdr);overflow:hidden;padding:.9rem 0;background:var(--sur2)}
-.mtrack{display:flex;gap:3rem;animation:mscroll 25s linear infinite;width:max-content}
-.mitem{font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--mut);white-space:nowrap}
-.mitem::after{content:'·';margin-left:3rem;opacity:.3}
-@keyframes mscroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-.sec{padding:5rem 3rem;max-width:1100px;margin:0 auto}
-.sechdr{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2.5rem;flex-wrap:wrap;gap:1rem}
-h2{font-size:1.75rem;font-weight:800;letter-spacing:-.03em}
-.scnt{font-size:.75rem;color:var(--mut);font-weight:500}
-.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:1.25rem}
-.pcard{border:1px solid var(--bdr);border-radius:16px;overflow:hidden;background:var(--sur);transition:all .25s;display:flex;flex-direction:column}
-.pcard:hover{border-color:var(--acc);transform:translateY(-4px);box-shadow:0 12px 40px var(--accl);background:var(--chov)}
-.cthumb{width:100%;height:180px;display:flex;align-items:center;justify-content:center;font-size:3rem;border-bottom:1px solid var(--bdr);position:relative;overflow:hidden}
-.tglow{position:absolute;inset:0;background:radial-gradient(circle at center,var(--accg) 0%,transparent 70%);opacity:0;transition:opacity .3s}
-.pcard:hover .tglow{opacity:1}
-.ctlbl{position:absolute;bottom:.75rem;left:.75rem;font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.2rem .6rem;border-radius:100px;background:var(--sur);color:var(--mut);border:1px solid var(--bdr)}
-[data-theme="dark"] .c1{background:linear-gradient(135deg,#0a0e1a,#0d1530)}
-[data-theme="dark"] .c2{background:linear-gradient(135deg,#0a1a10,#0d2515)}
-[data-theme="dark"] .c3{background:linear-gradient(135deg,#1a0a0e,#251015)}
-[data-theme="light"] .c1{background:linear-gradient(135deg,#e8f0ff,#d0e0ff)}
-[data-theme="light"] .c2{background:linear-gradient(135deg,#e8fff2,#d0ffe8)}
-[data-theme="light"] .c3{background:linear-gradient(135deg,#fff0f0,#ffe0e8)}
-.cbody{padding:1.5rem;flex:1;display:flex;flex-direction:column;gap:.6rem}
-.cmeta{display:flex;justify-content:space-between;align-items:center}
-.cnum{font-size:.65rem;color:var(--mut);font-weight:600;letter-spacing:.1em}
-.cbadge{font-size:.6rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.2rem .65rem;border-radius:100px;background:var(--sur2);color:var(--mut)}
-.ctitle{font-size:1rem;font-weight:700;letter-spacing:-.02em}
-.cdesc{font-size:.8rem;color:var(--mut);line-height:1.7;flex:1}
-.cfoot{margin-top:1rem;padding-top:1rem;border-top:1px solid var(--bdr);display:flex;gap:.5rem;flex-wrap:wrap}
-.ctag{font-size:.65rem;font-weight:600;padding:.2rem .6rem;border-radius:4px;background:var(--sur2);color:var(--mut);border:1px solid var(--bdr)}
-.agrid{display:grid;grid-template-columns:1.2fr 1fr;gap:2rem;align-items:start}
-@media(max-width:760px){.agrid{grid-template-columns:1fr}}
-.acard{background:var(--sur);border:1px solid var(--bdr);border-radius:16px;padding:2rem}
-.acard h3{font-size:1rem;font-weight:700;margin-bottom:1rem}
-.acard p{font-size:.85rem;color:var(--mut);line-height:1.9;margin-bottom:.75rem}
-.acard strong{color:var(--txt);font-weight:600}
-.elist{display:flex;flex-direction:column;gap:.5rem;margin-top:.5rem}
-.eitem{display:flex;align-items:center;gap:.75rem;font-size:.82rem;color:var(--mut);padding:.6rem .75rem;border-radius:8px;background:var(--sur2);border:1px solid var(--bdr);transition:all .15s}
-.eitem:hover{border-color:var(--acc);color:var(--txt)}
-.rcol{display:flex;flex-direction:column;gap:1.25rem}
-.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--bdr);border-radius:16px;overflow:hidden;border:1px solid var(--bdr)}
-.sbox{background:var(--sur);padding:1.4rem}
-.snum{font-size:1.9rem;font-weight:800;letter-spacing:-.04em;color:var(--acc)}
-.slbl{font-size:.65rem;color:var(--mut);margin-top:.2rem;font-weight:500}
-.fwcard{background:var(--sur);border:1px solid var(--bdr);border-radius:16px;padding:1.5rem}
-.fwcard h3{font-size:.82rem;font-weight:700;margin-bottom:1rem;color:var(--mut);text-transform:uppercase;letter-spacing:.1em}
-.fwi{display:flex;align-items:center;gap:.75rem;font-size:.8rem;color:var(--mut);padding:.5rem 0;border-bottom:1px solid var(--bdr)}
-.fwi:last-child{border-bottom:none}
-.fwd{width:6px;height:6px;border-radius:50%;background:var(--acc);flex-shrink:0}
-.spills{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1rem}
-.spill{font-size:.72rem;font-weight:600;padding:.3rem .85rem;border-radius:100px;background:var(--sur2);border:1px solid var(--bdr);color:var(--mut)}
-.cbox{background:var(--sur);border:1px solid var(--bdr);border-radius:20px;padding:3.5rem;display:flex;flex-direction:column;gap:2.5rem;position:relative;overflow:hidden}
-.cbox::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--acc),#60a5fa,var(--acc))}
-.ctop{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:2rem}
-.ctop h2{font-size:2rem;letter-spacing:-.03em;margin-bottom:.4rem}
-.ctop p{color:var(--mut);font-size:.88rem}
-.clinks{display:flex;gap:.75rem;flex-wrap:wrap}
-.clink{display:flex;align-items:center;gap:.5rem;font-size:.8rem;font-weight:600;color:var(--mut);text-decoration:none;border:1px solid var(--bdr);padding:.65rem 1.25rem;border-radius:100px;transition:all .18s;background:var(--sur2)}
-.clink:hover{border-color:var(--acc);color:var(--acc);background:var(--accl)}
-.waw{background:var(--sur2);border:1px solid var(--bdr);border-radius:16px;padding:1.75rem}
-.wahdr{display:flex;align-items:center;gap:.75rem;margin-bottom:1.5rem}
-.waico{width:44px;height:44px;border-radius:50%;background:#25d366;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.waico svg{width:22px;height:22px;fill:#fff}
-.watitle{font-size:.92rem;font-weight:700;display:block;margin-bottom:.25rem}
-.wasta{display:flex;align-items:center;gap:.4rem;font-size:.7rem;color:#22c55e;font-weight:600}
-.wadot{width:6px;height:6px;border-radius:50%;background:#22c55e;animation:pulse 2s infinite}
-.waform{display:flex;flex-direction:column;gap:.75rem}
-.wainp{width:100%;padding:.85rem 1rem;border-radius:10px;border:1px solid var(--bdr);background:var(--sur);color:var(--txt);font-family:'Manrope',sans-serif;font-size:.85rem;transition:all .2s;resize:none;outline:none}
-.wainp:focus{border-color:#25d366;box-shadow:0 0 0 3px rgba(37,211,102,.12)}
-.wainp::placeholder{color:var(--mut)}
-.wabtn{display:flex;align-items:center;justify-content:center;gap:.6rem;width:100%;padding:.9rem;border-radius:10px;background:#25d366;color:#fff;font-family:'Manrope',sans-serif;font-size:.85rem;font-weight:700;border:none;cursor:pointer;transition:all .2s}
-.wabtn:hover{background:#20bf5b;transform:translateY(-1px);box-shadow:0 8px 24px rgba(37,211,102,.35)}
-.wabtn svg{width:18px;height:18px;fill:#fff;flex-shrink:0}
-.wanote{font-size:.7rem;color:var(--mut);text-align:center}
-footer{border-top:1px solid var(--bdr);padding:1.5rem 3rem;display:flex;justify-content:space-between;font-size:.72rem;color:var(--mut);font-weight:500}
-.rev{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease}
-.rev.vis{opacity:1;transform:none}
-@media(max-width:640px){header{padding:1rem 1.25rem}nav a{display:none}.hero{padding:6rem 1.25rem 3rem}.sec{padding:3rem 1.25rem}footer{padding:1.25rem;flex-direction:column;gap:.5rem}.cbox{padding:1.75rem 1.25rem}}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="EMI Calc" />
+  <meta name="theme-color" content="#0f1117" />
+  <meta name="description" content="EMI Calculator — Loan repayment planner" />
+  <title>EMI Calculator</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0c12;
+      --surface: #13161f;
+      --card: #181c28;
+      --border: rgba(255,255,255,0.07);
+      --accent: #6ee7b7;
+      --accent2: #38bdf8;
+      --accent3: #f472b6;
+      --text: #f0f4ff;
+      --muted: #6b7280;
+      --radius: 20px;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* Ambient background glow */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -200px; left: -200px;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(110,231,183,0.08) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    body::after {
+      content: '';
+      position: fixed;
+      bottom: -150px; right: -150px;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(56,189,248,0.07) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .app {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      max-width: 480px;
+      margin: 0 auto;
+      padding: env(safe-area-inset-top, 0) 0 env(safe-area-inset-bottom, 0);
+    }
+
+    /* ── Header ── */
+    header {
+      padding: 52px 24px 20px;
+    }
+    .header-label {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+    header h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: 30px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+    }
+    header p {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    /* ── Loan Type Tabs ── */
+    .tabs {
+      display: flex;
+      gap: 8px;
+      padding: 0 24px 20px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tab {
+      flex-shrink: 0;
+      padding: 7px 16px;
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 500;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tab.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #0a0c12;
+    }
+
+    /* ── Main Card ── */
+    .card {
+      margin: 0 16px 16px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      backdrop-filter: blur(20px);
+    }
+
+    /* ── Inputs ── */
+    .field { margin-bottom: 24px; }
+    .field:last-child { margin-bottom: 0; }
+
+    .field-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .field-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      letter-spacing: 0.01em;
+    }
+    .field-value {
+      font-family: 'Syne', sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .field-unit {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--muted);
+      margin-left: 3px;
+    }
+
+    .number-input-row {
+      display: flex;
+      align-items: center;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 14px;
+      margin-bottom: 10px;
+      gap: 8px;
+    }
+    .currency-badge {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--accent);
+      min-width: 18px;
+    }
+    .number-input-row input[type="number"] {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-family: 'Syne', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      -moz-appearance: textfield;
+    }
+    .number-input-row input[type="number"]::-webkit-inner-spin-button,
+    .number-input-row input[type="number"]::-webkit-outer-spin-button { display: none; }
+    .step-btns { display: flex; gap: 4px; }
+    .step-btn {
+      width: 28px; height: 28px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      font-size: 16px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s, border-color 0.15s;
+      line-height: 1;
+      padding-bottom: 1px;
+    }
+    .step-btn:active { background: var(--accent); border-color: var(--accent); color: #0a0c12; }
+
+    /* Range Slider */
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 4px;
+      border-radius: 99px;
+      outline: none;
+      cursor: pointer;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 3px rgba(110,231,183,0.25);
+      cursor: pointer;
+      transition: box-shadow 0.2s;
+    }
+    input[type="range"]::-webkit-slider-thumb:active {
+      box-shadow: 0 0 0 6px rgba(110,231,183,0.3);
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+      border: none;
+    }
+
+    .range-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 6px;
+    }
+    .range-labels span {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    /* ── Result Card ── */
+    .result-card {
+      margin: 0 16px 16px;
+      background: linear-gradient(135deg, rgba(110,231,183,0.12), rgba(56,189,248,0.08));
+      border: 1px solid rgba(110,231,183,0.2);
+      border-radius: var(--radius);
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .result-card::before {
+      content: '';
+      position: absolute;
+      top: -40px; right: -40px;
+      width: 150px; height: 150px;
+      background: radial-gradient(circle, rgba(110,231,183,0.15), transparent 70%);
+    }
+    .result-label {
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+    .result-emi {
+      font-family: 'Syne', sans-serif;
+      font-size: 42px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.03em;
+      line-height: 1;
+    }
+    .result-emi .currency-sym { font-size: 26px; vertical-align: super; margin-right: 2px; opacity: 0.6; }
+    .result-sub {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* ── Breakdown Row ── */
+    .breakdown {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+      margin: 0 16px 16px;
+    }
+    .breakdown-item {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px 12px;
+    }
+    .breakdown-item .bi-label {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 5px;
+      letter-spacing: 0.03em;
+    }
+    .breakdown-item .bi-val {
+      font-family: 'Syne', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .breakdown-item .bi-val.green { color: var(--accent); }
+    .breakdown-item .bi-val.blue { color: var(--accent2); }
+    .breakdown-item .bi-val.pink { color: var(--accent3); }
+
+    /* ── Donut Chart ── */
+    .chart-card {
+      margin: 0 16px 16px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+    }
+    .chart-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: var(--text);
+    }
+    .donut-wrap {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+    .donut-svg { flex-shrink: 0; }
+    .donut-legend { flex: 1; }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .legend-dot {
+      width: 10px; height: 10px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+    .legend-info { flex: 1; }
+    .legend-name { font-size: 12px; color: var(--muted); }
+    .legend-amount {
+      font-family: 'Syne', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .legend-pct {
+      font-size: 11px;
+      color: var(--muted);
+      margin-left: 4px;
+    }
+
+    /* ── Amortization Table ── */
+    .table-card {
+      margin: 0 16px 24px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .table-header {
+      padding: 18px 20px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+    .table-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .toggle-table {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 12px;
+      padding: 5px 12px;
+      border-radius: 100px;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: all 0.2s;
+    }
+    .toggle-table:hover { border-color: var(--accent); color: var(--accent); }
+
+    .amortization-table { width: 100%; border-collapse: collapse; }
+    .amortization-table th {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 10px 20px;
+      text-align: right;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255,255,255,0.02);
+    }
+    .amortization-table th:first-child { text-align: left; }
+    .amortization-table td {
+      font-size: 13px;
+      padding: 11px 20px;
+      text-align: right;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      color: var(--text);
+    }
+    .amortization-table td:first-child { text-align: left; color: var(--muted); }
+    .amortization-table tr:last-child td { border-bottom: none; }
+    .amortization-table tr:hover td { background: rgba(255,255,255,0.02); }
+    .td-interest { color: var(--accent3) !important; }
+    .td-principal { color: var(--accent2) !important; }
+
+    /* ── Animations ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .card, .result-card, .breakdown, .chart-card, .table-card {
+      animation: fadeUp 0.4s ease both;
+    }
+    .result-card { animation-delay: 0.05s; }
+    .breakdown { animation-delay: 0.1s; }
+    .chart-card { animation-delay: 0.15s; }
+    .table-card { animation-delay: 0.2s; }
+
+    /* ── Utility ── */
+    .hidden { display: none !important; }
+    .section-spacer { height: 8px; }
+
+    @media (max-width: 360px) {
+      .result-emi { font-size: 36px; }
+      .breakdown { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
 </head>
 <body>
-<div class="grid-bg"></div>
-<div class="mglow" id="glow"></div>
-<div class="page">
 
-<header>
-  <a href="#" class="logo"><span class="at">@</span>idiotproof</a>
-  <nav>
-    <a href="#projects">Projects</a>
-    <a href="#about">About</a>
-    <a href="#contact">Contact</a>
-    <button class="tbtn" id="tbtn">🌙</button>
-  </nav>
-</header>
+<div class="app">
 
-<div class="hero">
-  <div style="width:100%">
-    <div class="tag-row">
-      <span class="tag tag-b"><span class="ldot"></span>Building in public</span>
-      <span class="tag">Product Manager</span>
-      <span class="tag">Video Platform Specialist</span>
-      <span class="tag">Vibe Coder</span>
-    </div>
-    <h1>
-      <span class="n1">Clint Ratnam.</span>
-      <span class="n2">PM &amp; Builder.</span>
-      <span class="n3">Shipped anyway.</span>
-    </h1>
-    <p class="hdesc">I lead <strong>product strategy</strong> for scalable video ecosystems — OTT, CMS, subscriber management &amp; personalisation. When I'm not writing specs, I'm shipping with AI because why wait?</p>
-    <div class="cta">
-      <a href="#projects" class="btn bp">View Projects →</a>
-      <a href="https://linkedin.com/in/idiotproof" class="btn bg2" target="_blank">LinkedIn ↗</a>
-      <a href="https://github.com/idiotproof" class="btn bg2" target="_blank">GitHub ↗</a>
-    </div>
-    <div class="chips">
-      <span class="chip">Subscription Monetization</span>
-      <span class="chip">Video CMS &amp; EPG</span>
-      <span class="chip">Churn Strategy</span>
-      <span class="chip">Product-Led Growth</span>
-      <span class="chip">AI-Enabled PM</span>
-      <span class="chip">Data-Driven Roadmapping</span>
-      <span class="chip">Analytics &amp; Personalization</span>
-    </div>
+  <header>
+    <div class="header-label">Finance Tool</div>
+    <h1>EMI Calculator</h1>
+    <p>Plan your loan repayments easily</p>
+  </header>
+
+  <!-- Loan Type Tabs -->
+  <div class="tabs">
+    <button class="tab active" onclick="setType(this,'Home Loan')">🏠 Home Loan</button>
+    <button class="tab" onclick="setType(this,'Car Loan')">🚗 Car Loan</button>
+    <button class="tab" onclick="setType(this,'Personal Loan')">💼 Personal</button>
+    <button class="tab" onclick="setType(this,'Education')">🎓 Education</button>
   </div>
-</div>
 
-<div class="mwrap">
-  <div class="mtrack">
-    <span class="mitem">Claude AI</span><span class="mitem">Lovable</span><span class="mitem">Bolt</span><span class="mitem">GitHub Pages</span><span class="mitem">v0</span><span class="mitem">OTT Platforms</span><span class="mitem">Video CMS</span><span class="mitem">Growth Strategy</span><span class="mitem">Claude AI</span><span class="mitem">Lovable</span><span class="mitem">Bolt</span><span class="mitem">GitHub Pages</span><span class="mitem">v0</span><span class="mitem">OTT Platforms</span><span class="mitem">Video CMS</span><span class="mitem">Growth Strategy</span>
-  </div>
-</div>
+  <!-- Input Card -->
+  <div class="card">
 
-<div class="sec" id="projects">
-  <div class="sechdr rev"><h2>Projects</h2><span class="scnt">More dropping soon</span></div>
-  <div class="cgrid">
-    <div class="pcard rev">
-      <div class="cthumb c1"><div class="tglow"></div><span>🎬</span><span class="ctlbl">In progress</span></div>
-      <div class="cbody">
-        <div class="cmeta"><span class="cnum">01</span><span class="cbadge">Coming soon</span></div>
-        <div class="ctitle">First project title</div>
-        <div class="cdesc">A short description of what this tool does and who it's for. Something useful, built fast.</div>
-        <div class="cfoot"><span class="ctag">Claude AI</span><span class="ctag">Lovable</span></div>
+    <!-- Loan Amount -->
+    <div class="field">
+      <div class="field-header">
+        <span class="field-label">Loan Amount</span>
+        <span class="field-value" id="amountDisplay">₹10,00,000<span class="field-unit"></span></span>
       </div>
-    </div>
-    <div class="pcard rev">
-      <div class="cthumb c2"><div class="tglow"></div><span>📊</span><span class="ctlbl">In progress</span></div>
-      <div class="cbody">
-        <div class="cmeta"><span class="cnum">02</span><span class="cbadge">Coming soon</span></div>
-        <div class="ctitle">Second project title</div>
-        <div class="cdesc">Something's brewing — a PM tool, a template, or a live app. Stay tuned.</div>
-        <div class="cfoot"><span class="ctag">Bolt</span><span class="ctag">v0</span></div>
-      </div>
-    </div>
-    <div class="pcard rev">
-      <div class="cthumb c3"><div class="tglow"></div><span>🚀</span><span class="ctlbl">In progress</span></div>
-      <div class="cbody">
-        <div class="cmeta"><span class="cnum">03</span><span class="cbadge">Coming soon</span></div>
-        <div class="ctitle">Third project title</div>
-        <div class="cdesc">Watch this space. Ideas becoming products one vibe session at a time.</div>
-        <div class="cfoot"><span class="ctag">GitHub Pages</span><span class="ctag">Claude AI</span></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="sec" id="about">
-  <div class="sechdr rev"><h2>About</h2></div>
-  <div class="agrid">
-    <div class="acard rev">
-      <h3>👋 Hi, I'm Clint Ratnam</h3>
-      <p>I lead <strong>product strategy and platform evolution</strong> for scalable video ecosystems. Experienced in OTT, CMS, Subscriber Management, Analytics &amp; Personalisation.</p>
-      <p>A <strong>PM who got tired of waiting for engineers</strong> — now using AI as my co-pilot to just ship.</p>
-      <div class="elist">
-        <div class="eitem">💰 Subscription Monetization</div>
-        <div class="eitem">📺 Video CMS &amp; EPG Systems</div>
-        <div class="eitem">📉 User Retention &amp; Churn Strategy</div>
-        <div class="eitem">🌱 Product-Led Growth</div>
-        <div class="eitem">🗺️ Data-Driven Roadmapping</div>
-        <div class="eitem">🤖 AI-Enabled Product Management</div>
-      </div>
-      <div class="spills">
-        <span class="spill">Claude AI</span><span class="spill">Lovable</span><span class="spill">Bolt</span><span class="spill">v0</span><span class="spill">GitHub Pages</span>
-      </div>
-    </div>
-    <div class="rcol">
-      <div class="sgrid rev">
-        <div class="sbox"><div class="snum">OTT</div><div class="slbl">Specialist</div></div>
-        <div class="sbox"><div class="snum">∞</div><div class="slbl">Ideas in backlog</div></div>
-        <div class="sbox"><div class="snum">0</div><div class="slbl">Lines hand-written</div></div>
-        <div class="sbox"><div class="snum">100%</div><div class="slbl">Vibe coded</div></div>
-      </div>
-      <div class="fwcard rev">
-        <h3>🧠 Frameworks &amp; Templates</h3>
-        <div class="fwi"><span class="fwd"></span>Feature Prioritization (RICE + Impact Hybrid)</div>
-        <div class="fwi"><span class="fwd"></span>Churn Analysis Framework</div>
-        <div class="fwi"><span class="fwd"></span>Product Discovery Checklist</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="sec" id="contact">
-  <div class="cbox rev">
-    <div class="ctop">
-      <div>
-        <h2>Let's connect.</h2>
-        <p>PM, builder, or just curious? Say hi.</p>
-      </div>
-      <div class="clinks">
-        <a href="https://linkedin.com/in/idiotproof" class="clink" target="_blank">💼 LinkedIn</a>
-        <a href="mailto:clintratnam@gmail.com" class="clink">✉ Email</a>
-        <a href="https://github.com/idiotproof" class="clink" target="_blank">⌥ GitHub</a>
-      </div>
-    </div>
-    <div class="waw">
-      <div class="wahdr">
-        <div class="waico">
-          <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-        </div>
-        <div>
-          <span class="watitle">Chat with Clint on WhatsApp</span>
-          <div class="wasta"><span class="wadot"></span>Typically replies within a few hours</div>
+      <div class="number-input-row">
+        <span class="currency-badge">₹</span>
+        <input type="number" id="amountInput" value="1000000" min="10000" max="100000000" step="10000"
+          oninput="syncFromInput('amount')" />
+        <div class="step-btns">
+          <button class="step-btn" onclick="step('amount',-1)">−</button>
+          <button class="step-btn" onclick="step('amount',1)">+</button>
         </div>
       </div>
-      <div class="waform">
-        <input class="wainp" id="waName" type="text" placeholder="Your name (optional)"/>
-        <textarea class="wainp" id="waMsg" rows="3" placeholder="Type your message to Clint..."></textarea>
-        <button class="wabtn" onclick="sendWA()">
-          <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-          Send on WhatsApp
-        </button>
-        <p class="wanote">Opens WhatsApp with your message pre-filled — direct to Clint's phone.</p>
+      <input type="range" id="amountRange" min="10000" max="10000000" step="10000" value="1000000"
+        oninput="syncFromRange('amount')" />
+      <div class="range-labels"><span>₹10K</span><span>₹1Cr</span></div>
+    </div>
+
+    <!-- Interest Rate -->
+    <div class="field">
+      <div class="field-header">
+        <span class="field-label">Interest Rate</span>
+        <span class="field-value" id="rateDisplay">8.5<span class="field-unit">% p.a.</span></span>
+      </div>
+      <div class="number-input-row">
+        <span class="currency-badge">%</span>
+        <input type="number" id="rateInput" value="8.5" min="1" max="30" step="0.1"
+          oninput="syncFromInput('rate')" />
+        <div class="step-btns">
+          <button class="step-btn" onclick="step('rate',-1)">−</button>
+          <button class="step-btn" onclick="step('rate',1)">+</button>
+        </div>
+      </div>
+      <input type="range" id="rateRange" min="1" max="30" step="0.1" value="8.5"
+        oninput="syncFromRange('rate')" />
+      <div class="range-labels"><span>1%</span><span>30%</span></div>
+    </div>
+
+    <!-- Tenure -->
+    <div class="field">
+      <div class="field-header">
+        <span class="field-label">Loan Tenure</span>
+        <span class="field-value" id="tenureDisplay">20<span class="field-unit"> Yr</span></span>
+      </div>
+      <div class="number-input-row">
+        <span class="currency-badge">Yr</span>
+        <input type="number" id="tenureInput" value="20" min="1" max="30" step="1"
+          oninput="syncFromInput('tenure')" />
+        <div class="step-btns">
+          <button class="step-btn" onclick="step('tenure',-1)">−</button>
+          <button class="step-btn" onclick="step('tenure',1)">+</button>
+        </div>
+      </div>
+      <input type="range" id="tenureRange" min="1" max="30" step="1" value="20"
+        oninput="syncFromRange('tenure')" />
+      <div class="range-labels"><span>1 Yr</span><span>30 Yr</span></div>
+    </div>
+
+  </div>
+
+  <!-- Result Card -->
+  <div class="result-card">
+    <div class="result-label">Monthly EMI</div>
+    <div class="result-emi"><span class="currency-sym">₹</span><span id="emiValue">8,678</span></div>
+    <div class="result-sub" id="emiSubtitle">For 240 months · Starts next month</div>
+  </div>
+
+  <!-- Breakdown -->
+  <div class="breakdown">
+    <div class="breakdown-item">
+      <div class="bi-label">Principal</div>
+      <div class="bi-val green" id="principalVal">₹10L</div>
+    </div>
+    <div class="breakdown-item">
+      <div class="bi-label">Interest</div>
+      <div class="bi-val pink" id="interestVal">₹10.8L</div>
+    </div>
+    <div class="breakdown-item">
+      <div class="bi-label">Total</div>
+      <div class="bi-val blue" id="totalVal">₹20.8L</div>
+    </div>
+  </div>
+
+  <!-- Donut Chart -->
+  <div class="chart-card">
+    <div class="chart-title">Payment Breakdown</div>
+    <div class="donut-wrap">
+      <svg class="donut-svg" width="120" height="120" viewBox="0 0 120 120" id="donutSvg">
+        <circle cx="60" cy="60" r="46" fill="none" stroke="#1e2234" stroke-width="18"/>
+        <circle id="donutInterest" cx="60" cy="60" r="46" fill="none" stroke="#f472b6" stroke-width="18"
+          stroke-linecap="round" stroke-dasharray="0 289" transform="rotate(-90 60 60)" style="transition:stroke-dasharray 0.6s ease"/>
+        <circle id="donutPrincipal" cx="60" cy="60" r="46" fill="none" stroke="#38bdf8" stroke-width="18"
+          stroke-linecap="round" stroke-dasharray="0 289" transform="rotate(-90 60 60)" style="transition:stroke-dasharray 0.6s ease"/>
+      </svg>
+      <div class="donut-legend">
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#38bdf8"></div>
+          <div class="legend-info">
+            <div class="legend-name">Principal Amount</div>
+            <div class="legend-amount" id="legendPrincipal">₹10,00,000<span class="legend-pct" id="pctPrincipal">(48%)</span></div>
+          </div>
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#f472b6"></div>
+          <div class="legend-info">
+            <div class="legend-name">Total Interest</div>
+            <div class="legend-amount" id="legendInterest">₹10,82,720<span class="legend-pct" id="pctInterest">(52%)</span></div>
+          </div>
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#6ee7b7"></div>
+          <div class="legend-info">
+            <div class="legend-name">Total Payable</div>
+            <div class="legend-amount" id="legendTotal">₹20,82,720</div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
+
+  <!-- Amortization Table -->
+  <div class="table-card">
+    <div class="table-header">
+      <div class="table-title">Year-wise Schedule</div>
+      <button class="toggle-table" id="toggleBtn" onclick="toggleTable()">Show</button>
+    </div>
+    <div id="tableWrap" class="hidden">
+      <table class="amortization-table">
+        <thead>
+          <tr>
+            <th>Year</th>
+            <th>Principal</th>
+            <th>Interest</th>
+            <th>Balance</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
 </div>
 
-<footer>
-  <span>© 2025 @idiotproof · Clint Ratnam</span>
-  <span>built with AI · shipped with intent</span>
-</footer>
-
-</div>
 <script>
-var g=document.getElementById('glow');
-document.addEventListener('mousemove',function(e){g.style.left=e.clientX+'px';g.style.top=e.clientY+'px';});
-var tb=document.getElementById('tbtn'),h=document.documentElement;
-function setT(t){h.setAttribute('data-theme',t);tb.textContent=t==='dark'?'🌙':'☀️';try{localStorage.setItem('ipt',t);}catch(e){}}
-try{setT(localStorage.getItem('ipt')||'dark');}catch(e){setT('dark');}
-tb.addEventListener('click',function(){setT(h.getAttribute('data-theme')==='dark'?'light':'dark');});
-var els=document.querySelectorAll('.rev');
-var ob=new IntersectionObserver(function(entries){entries.forEach(function(en,i){if(en.isIntersecting){setTimeout(function(){en.target.classList.add('vis');},i*80);ob.unobserve(en.target);}});},{threshold:0.1});
-els.forEach(function(el){ob.observe(el);});
-function sendWA(){
-  var n=document.getElementById('waName').value.trim();
-  var m=document.getElementById('waMsg').value.trim();
-  if(!m){alert('Please type a message first!');return;}
-  var t=n?'Hi Clint! I am '+n+'. '+m:m;
-  window.open('https://wa.me/918879374225?text='+encodeURIComponent(t),'_blank');
-}
+  // ── State ──
+  const state = {
+    amount: 1000000,
+    rate: 8.5,
+    tenure: 20,
+    type: 'Home Loan'
+  };
+
+  // ── Sync helpers ──
+  function syncFromRange(field) {
+    const val = parseFloat(document.getElementById(field + 'Range').value);
+    state[field] = val;
+    document.getElementById(field + 'Input').value = val;
+    calculate();
+  }
+  function syncFromInput(field) {
+    const el = document.getElementById(field + 'Input');
+    let val = parseFloat(el.value);
+    const rangeEl = document.getElementById(field + 'Range');
+    if (isNaN(val)) return;
+    val = Math.min(Math.max(val, parseFloat(rangeEl.min)), parseFloat(rangeEl.max));
+    state[field] = val;
+    rangeEl.value = val;
+    calculate();
+  }
+  function step(field, dir) {
+    const el = document.getElementById(field + 'Input');
+    const step = parseFloat(el.step) || 1;
+    el.value = parseFloat(el.value) + dir * step;
+    syncFromInput(field);
+  }
+  function setType(el, type) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    state.type = type;
+  }
+
+  // ── Core EMI Calculation ──
+  function calcEMI(P, annualRate, years) {
+    const r = annualRate / 12 / 100;
+    const n = years * 12;
+    if (r === 0) return P / n;
+    return P * r * Math.pow(1 + r, n) / (Math.pow(1 + r, n) - 1);
+  }
+
+  function fmtINR(n) {
+    return new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(Math.round(n));
+  }
+  function fmtShort(n) {
+    if (n >= 10000000) return '₹' + (n / 10000000).toFixed(1) + 'Cr';
+    if (n >= 100000) return '₹' + (n / 100000).toFixed(1) + 'L';
+    if (n >= 1000) return '₹' + (n / 1000).toFixed(1) + 'K';
+    return '₹' + Math.round(n);
+  }
+
+  // Gradient on range
+  function updateRangeGradient(field) {
+    const el = document.getElementById(field + 'Range');
+    const min = parseFloat(el.min), max = parseFloat(el.max), val = parseFloat(el.value);
+    const pct = ((val - min) / (max - min)) * 100;
+    el.style.background = `linear-gradient(to right, #6ee7b7 0%, #6ee7b7 ${pct}%, #1e2234 ${pct}%, #1e2234 100%)`;
+  }
+
+  function calculate() {
+    const { amount, rate, tenure } = state;
+    const emi = calcEMI(amount, rate, tenure);
+    const totalPayment = emi * tenure * 12;
+    const totalInterest = totalPayment - amount;
+    const months = tenure * 12;
+    const pctPrincipal = Math.round((amount / totalPayment) * 100);
+    const pctInterest = 100 - pctPrincipal;
+
+    // Update EMI display
+    document.getElementById('emiValue').textContent = fmtINR(emi);
+    document.getElementById('emiSubtitle').textContent = `For ${months} months · Starts next month`;
+
+    // Breakdown
+    document.getElementById('principalVal').textContent = fmtShort(amount);
+    document.getElementById('interestVal').textContent = fmtShort(totalInterest);
+    document.getElementById('totalVal').textContent = fmtShort(totalPayment);
+
+    // Amount display
+    document.getElementById('amountDisplay').innerHTML = fmtShort(amount);
+    document.getElementById('rateDisplay').innerHTML = `${rate}<span class="field-unit">% p.a.</span>`;
+    document.getElementById('tenureDisplay').innerHTML = `${tenure}<span class="field-unit"> Yr</span>`;
+
+    // Legend
+    document.getElementById('legendPrincipal').innerHTML = `₹${fmtINR(amount)}<span class="legend-pct">(${pctPrincipal}%)</span>`;
+    document.getElementById('legendInterest').innerHTML = `₹${fmtINR(totalInterest)}<span class="legend-pct">(${pctInterest}%)</span>`;
+    document.getElementById('legendTotal').innerHTML = `₹${fmtINR(totalPayment)}`;
+
+    // Donut chart (circumference = 2πr = 2*π*46 ≈ 289)
+    const circ = 2 * Math.PI * 46;
+    const pSlice = (pctPrincipal / 100) * circ;
+    const iSlice = (pctInterest / 100) * circ;
+    // Principal arc first, then interest offset
+    const pEl = document.getElementById('donutPrincipal');
+    const iEl = document.getElementById('donutInterest');
+    pEl.setAttribute('stroke-dasharray', `${pSlice} ${circ - pSlice}`);
+    pEl.setAttribute('stroke-dashoffset', '0');
+    iEl.setAttribute('stroke-dasharray', `${iSlice} ${circ - iSlice}`);
+    iEl.setAttribute('stroke-dashoffset', `${-pSlice}`);
+
+    // Range gradients
+    updateRangeGradient('amount');
+    updateRangeGradient('rate');
+    updateRangeGradient('tenure');
+
+    // Amortization table
+    buildAmortTable(amount, rate, tenure, emi);
+  }
+
+  function buildAmortTable(P, annualRate, years, emi) {
+    const r = annualRate / 12 / 100;
+    let balance = P;
+    const tbody = document.getElementById('tableBody');
+    tbody.innerHTML = '';
+    for (let y = 1; y <= years; y++) {
+      let yearPrincipal = 0, yearInterest = 0;
+      for (let m = 0; m < 12; m++) {
+        if (balance <= 0) break;
+        const interest = balance * r;
+        const principal = Math.min(emi - interest, balance);
+        yearInterest += interest;
+        yearPrincipal += principal;
+        balance -= principal;
+      }
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>Yr ${y}</td>
+        <td class="td-principal">₹${fmtINR(yearPrincipal)}</td>
+        <td class="td-interest">₹${fmtINR(yearInterest)}</td>
+        <td>₹${fmtINR(Math.max(balance, 0))}</td>
+      `;
+      tbody.appendChild(tr);
+    }
+  }
+
+  let tableVisible = false;
+  function toggleTable() {
+    tableVisible = !tableVisible;
+    document.getElementById('tableWrap').classList.toggle('hidden', !tableVisible);
+    document.getElementById('toggleBtn').textContent = tableVisible ? 'Hide' : 'Show';
+  }
+
+  // ── Init ──
+  calculate();
+
+  // ── Service Worker (offline PWA) ──
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js').catch(() => {});
+    });
+  }
 </script>
+
 </body>
 </html>
